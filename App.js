@@ -4,6 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import LoginScreen from './screens/LoginScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import RegisterChoiceScreen from './screens/RegisterChoiceScreen';
+import BusinessRegister from './screens/BusinessRegister';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,8 +17,12 @@ export default function App() {
         screenOptions={{
           headerShown: false
         }}
+        initialRouteName="Login"
       >
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="RegisterChoice" component={RegisterChoiceScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="BusinessRegister" component={BusinessRegister} />
       </Stack.Navigator>
     </NavigationContainer>
   );
