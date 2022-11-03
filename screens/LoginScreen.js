@@ -23,7 +23,7 @@ function LoginScreen({navigation}){
             >
                 <Text>Forgot password?</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Question')}>
                 <GradientTextButton text="Sign In" styles={styles} />
             </TouchableOpacity>
             <TouchableOpacity

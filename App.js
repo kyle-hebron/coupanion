@@ -7,6 +7,7 @@ import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import RegisterChoiceScreen from './screens/RegisterChoiceScreen';
 import BusinessRegister from './screens/BusinessRegister';
+import Question from './screens/Question';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name="RegisterChoice" component={RegisterChoiceScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="BusinessRegister" component={BusinessRegister} />
+        <Stack.Screen name="Question" component={Question} />
       </Stack.Navigator>
     </NavigationContainer>
   );
