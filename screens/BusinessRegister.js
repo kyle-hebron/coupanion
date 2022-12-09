@@ -26,7 +26,7 @@ export default function RegisterScreen({navigation}){
                 <PlainInput icon="house-user" text="ZIP"  secure={false} />
             </View>
             <View styles={styles.bottom}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {navigation.navigate('CouponMaker')}}>
                     <GradientTextButton text={"Sign Up"} styles={styles} />
                 </TouchableOpacity>
             </View>
