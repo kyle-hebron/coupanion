@@ -9,6 +9,7 @@ import RegisterChoiceScreen from './screens/RegisterChoiceScreen';
 import BusinessRegister from './screens/BusinessRegister';
 import Question from './screens/Question';
 import HomeScreen from './screens/HomeScreen';
+import CouponMaker from './screens/CouponMaker';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,7 @@ export default function App() {
         <Stack.Screen name="BusinessRegister" component={BusinessRegister} />
         <Stack.Screen name="Question" component={Question} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="CouponMaker" component={CouponMaker} />
       </Stack.Navigator>
     </NavigationContainer>
   );
