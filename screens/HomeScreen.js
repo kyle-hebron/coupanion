@@ -66,7 +66,7 @@ export default function HomeScreen({navigation}) {
                 )
             }}/>
         <View style={{ paddingTop: 20 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Nearby</Text>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Top Rated</Text>
         </View>
         <FlatList
             data = {nearby}
