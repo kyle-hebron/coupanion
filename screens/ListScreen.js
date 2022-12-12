@@ -10,6 +10,7 @@ export default function ListScreen({navigation}) {
             name: "Porto's Bakery",
             tag: 'Bakery',
             rating: '90%',
+            miles: '1.1mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/portos.png')
         },
@@ -18,6 +19,7 @@ export default function ListScreen({navigation}) {
             name: "Anne's Pastries",
             tag: 'Bakery',
             rating: '75%',
+            miles: '1.5mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/restuarant.png')
         },
@@ -26,6 +28,7 @@ export default function ListScreen({navigation}) {
             name: "The Italian",
             tag: 'Restaurant',
             rating: '80%',
+            miles: '1.8mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/company.png')
         },
@@ -34,6 +37,7 @@ export default function ListScreen({navigation}) {
             name: "Pizza Palace",
             tag: 'Restaurant',
             rating: '60%',
+            miles: '0.6mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/pizza.png')
         },
@@ -42,6 +46,7 @@ export default function ListScreen({navigation}) {
             name: "Olive Garden",
             tag: 'Restaurant',
             rating: '45%',
+            miles: '2.2mi',
             thumb: require('../../assets/thumbDown.png'),
             image: require('../../assets/logos/olive.png')
         },
@@ -50,6 +55,7 @@ export default function ListScreen({navigation}) {
             name: "Lily's Flowers",
             tag: 'Shop',
             rating: '85%',
+            miles: '1.5mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/flower.jpg')
         },
@@ -58,6 +64,7 @@ export default function ListScreen({navigation}) {
             name: "Jollibee",
             tag: 'Fast Food',
             rating: '70%',
+            miles: '3.4mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/Jolibee.png')
         },
@@ -66,14 +73,16 @@ export default function ListScreen({navigation}) {
             name: "Spicy Thai",
             tag: 'Reastaurant',
             rating: '65%',
+            miles: '2.6mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/thai.png')
         },
         {
             id: 9,
-            name: "Maria's Mexican Grill",
+            name: "Mexican Grill",
             tag: 'Restuarant',
             rating: '75%',
+            miles: '4.1mi',
             thumb: require('../../assets/thumbUp.png'),
             image: require('../../assets/logos/mexican.jpg')
         },
@@ -82,6 +91,7 @@ export default function ListScreen({navigation}) {
             name: "McDonalds",
             tag: 'Fast Food',
             rating: '30%',
+            miles: '0.3mi',
             thumb: require('../../assets/thumbDown.png'),
             image: require('../../assets/logos/mcdonalds.png')
         },
@@ -105,6 +115,7 @@ export default function ListScreen({navigation}) {
                 <View style={styles.nameContainer}>
                     <Text style={styles.text}>{item.name}</Text>
                     <Text style={styles.tag}>{item.tag}</Text>
+                    <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
                     </View>
                 <View style={styles.ratingContainer}>
                 <Image source={item.thumb} style={styles.thumb}/>
@@ -121,6 +132,7 @@ export default function ListScreen({navigation}) {
             <View style={styles.nameContainer}>
                 <Text style={styles.text}>{item.name}</Text>
                 <Text style={styles.tag}>{item.tag}</Text>
+                <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
                 </View>
             <View style={styles.ratingContainer}>
             <Image source={item.thumb} style={styles.thumb}/>
@@ -179,6 +191,7 @@ const styles = StyleSheet.create({
     thumb: {
         height: 40,
         width: 40,
+        borderRadius:100,
         backgroundColor: '#DDDFE0',
     },
     textInput: {
