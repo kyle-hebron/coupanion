@@ -1,14 +1,56 @@
-import React, { Component, useRef, useEffect } from 'react'
+import React, { Component, useRef, useEffect, useState } from 'react'
 import { StyleSheet, Text, View, SafeAreaView, Image, TextInput, KeyboardAvoidingView, TouchableOpacity, ScrollView, Button, GradientTextButton } from 'react-native';
 import {Linking} from 'react-native'
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase"
 
 
 //import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
-
+//Yes, I know this is ugly -Kyle
 export default function BusinessPage({navigation}) {
-
-    let count = 90;
-
+    
+    const [users, setUsers] = useState(' ');
+    const [address, setAddress] = useState(' ');
+    const [city, setCity] = useState(' ');
+    const [number, setNumber] = useState(' ');
+    const [zip, setZip] = useState(' ');
+    const [state, setState] = useState(' ');
+    const [pic, setPic] = useState(' ');
+    
+    useEffect(() => {
+        async function fetchData() {
+        const q = query(collection(db, "Business people"));
+        const querySnapshot=await getDocs(q);
+        const users = [];
+        querySnapshot.forEach((doc) => {
+            if(doc.id === "FcG7W99f30VRqgKSQ5Im"){
+                const owner = doc.data().owner;
+                const address = doc.data().address1;
+                const city = doc.data().city;
+                const number = doc.data().phone;
+                const zip = doc.data().zip;
+                const state = doc.data().state;
+                //const pic = doc.data().pic;
+            
+                setUsers(owner);
+                setAddress(address);
+                setCity(city);
+                setNumber(number);
+                setZip(zip);
+                setState(state);
+                //setPic(pic);
+                
+            }
+            
+        });
+        
+    }
+    fetchData();
+    }, [])
+   
+    
+   
+   
     return (
        
         <SafeAreaView style={styles.container}>
@@ -20,9 +62,9 @@ export default function BusinessPage({navigation}) {
                 style={styles.logo} 
             />
                 <View style={{paddingHorizontal: 15, paddingTop: 20}}>
-                    <Text style={{alignItems: 'left', fontSize: 25, color: 'white', fontWeight: 'bold'}}>Wendys</Text>
-                    <Text style={styles.name}>18111 Nordhoff St, Northridge, CA 91330 </Text>
-                    <Text onPress={()=>{Linking.openURL('tel:(818) 677-1200');}} style={styles.name}>(818) 677-1200</Text>
+                    <Text style={{alignItems: 'left', fontSize: 25, color: 'white', fontWeight: 'bold'}}>{users}</Text>
+                    <Text style={styles.name}>{address}, {city}, {state}, {zip} </Text>
+                    <Text onPress={()=>{Linking.openURL(num);}} style={styles.name}>{number}</Text>
                 </View>
             </View>
 
