@@ -11,7 +11,7 @@ import Question from './screens/Question';
 import HomeScreen from './screens/HomeScreen';
 import BusinessPage from './screens/BusinessPage';
 import CouponMaker from './screens/CouponMaker';
-import ListScreen from './screens/ListScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +32,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="CouponMaker" component={CouponMaker} />
         <Stack.Screen name="Business" component={BusinessPage}/>
-        <Stack.Screen name="List" component={ListScreen}/>
+        
         
       </Stack.Navigator>
     </NavigationContainer>
