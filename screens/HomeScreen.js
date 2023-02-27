@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, FlatList, SafeAreaView } from 'react-native';
-import { db } from '../firebase';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  SafeAreaView,
+} from "react-native";
+import { db } from "../firebase";
 
 export default function HomeScreen({ navigation }) {
   const [trendingBusinesses, setTrendingBusinesses] = useState([]);
@@ -8,7 +15,9 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     // Get trending businesses from Firestore .
-    const trendingBusinessesRef = db.collection('Business people').where('trending', '==', true);
+    const trendingBusinessesRef = db
+      .collection("Business people")
+      .where("trending", "==", true);
     const unsubscribeTrending = trendingBusinessesRef.onSnapshot((snapshot) => {
       const businesses = [];
       snapshot.forEach((doc) => {
@@ -17,14 +26,16 @@ export default function HomeScreen({ navigation }) {
           id: doc.id,
           name: data.username,
           tag: data.tag,
-          image: { uri: data.image }
+          image: { uri: data.image },
         });
       });
       setTrendingBusinesses(businesses);
     });
 
     // Get top rated businesses from Firestore .
-    const topRatedBusinessesRef = db.collection('Business people').where('top rated', '==', true);
+    const topRatedBusinessesRef = db
+      .collection("Business people")
+      .where("top rated", "==", true);
     const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot((snapshot) => {
       const businesses = [];
       snapshot.forEach((doc) => {
@@ -33,7 +44,7 @@ export default function HomeScreen({ navigation }) {
           id: doc.id,
           name: data.username,
           tag: data.tag,
-          image: { uri: data.image }
+          image: { uri: data.image },
         });
       });
       setTopRatedBusinesses(businesses);
@@ -65,7 +76,7 @@ export default function HomeScreen({ navigation }) {
         <FlatList
           data={trendingBusinesses}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
         />
       </View>
       <View style={styles.topRatedContainer}>
@@ -73,7 +84,7 @@ export default function HomeScreen({ navigation }) {
         <FlatList
           data={topRatedBusinesses}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id.toString()}
         />
       </View>
     </SafeAreaView>
@@ -81,73 +92,73 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingHorizontal: 10,
-      paddingTop: 30,
-    },
-    headerContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingBottom: 10,
-    },
-    headerText: {
-      fontSize: 33,
-      fontWeight: 'bold',
-    },
-    item: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginVertical: 8,
-      marginHorizontal: 16,
-      paddingVertical: 8,
-      paddingHorizontal: 33,
-      borderRadius: 8,
-      backgroundColor: '#f5f5f5',
-    },
-    logo: {
-      width: 64,
-      height: 64,
-      borderRadius: 32,
-      marginRight: 33,
-    },
-    textContainer: {
-      flex: 1,
-    },
-    text: {
-      fontSize: 19,
-      fontWeight: 'bold',
-      marginBottom: 4,
-    },
-    tag: {
-      fontSize: 13,
-      color: '#666',
-      fontWeight: 'bold',
-    },
-    trendingContainer: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingTop: 16,
-      paddingBottom: 16,
-    },
-    trendingText: {
-      fontSize: 25,
-      fontWeight: 'bold',
-      paddingHorizontal: 16,
-      marginBottom: 16,
-    },
-    topRatedContainer: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingTop: 16,
-      paddingBottom: 16,
-    },
-    topRatedText: {
-      fontSize: 25,
-      fontWeight: 'bold',
-      paddingHorizontal: 16,
-      marginBottom: 16,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 10,
+    paddingTop: 30,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 10,
+  },
+  headerText: {
+    fontSize: 33,
+    fontWeight: "bold",
+  },
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 8,
+    marginHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 33,
+    borderRadius: 8,
+    backgroundColor: "#f5f5f5",
+  },
+  logo: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    marginRight: 33,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  text: {
+    fontSize: 19,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  tag: {
+    fontSize: 13,
+    color: "#666",
+    fontWeight: "bold",
+  },
+  trendingContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  trendingText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  topRatedContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  topRatedText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+});
