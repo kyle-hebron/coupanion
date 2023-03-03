@@ -15,7 +15,6 @@ import {
 import { Linking } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import BottomTab, { bottomTabIcons } from "../components/BottomTab";
 
 //import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 //Yes, I know this is ugly -Kyle
@@ -259,7 +258,6 @@ export default function BusinessPage({ navigation }) {
 					</Text>
 				</TouchableOpacity>
 			</ScrollView>
-			<BottomTab icons={bottomTabIcons} />
 		</SafeAreaView>
 	);
 }

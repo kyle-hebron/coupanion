@@ -6,10 +6,11 @@ import {
 	Image,
 	FlatList,
 	SafeAreaView,
+	SafeAreaProvider,
 } from "react-native";
 import { db } from "../firebase";
 
-export default function HomeScreen({ navigation }) {
+function HomeScreen() {
 	const [trendingBusinesses, setTrendingBusinesses] = useState([]);
 	const [topRatedBusinesses, setTopRatedBusinesses] = useState([]);
 
@@ -67,29 +68,27 @@ export default function HomeScreen({ navigation }) {
 	);
 
 	return (
-		<SafeAreaProvider>
-			<SafeAreaView style={styles.container}>
-				<View style={styles.headerContainer}>
-					<Text style={styles.headerText}>E x p l o r e</Text>
-				</View>
-				<View style={styles.trendingContainer}>
-					<Text style={styles.trendingText}>Trending</Text>
-					<FlatList
-						data={trendingBusinesses}
-						renderItem={renderItem}
-						keyExtractor={(item) => item.id.toString()}
-					/>
-				</View>
-				<View style={styles.topRatedContainer}>
-					<Text style={styles.topRatedText}>Top Rated</Text>
-					<FlatList
-						data={topRatedBusinesses}
-						renderItem={renderItem}
-						keyExtractor={(item) => item.id.toString()}
-					/>
-				</View>
-			</SafeAreaView>
-		</SafeAreaProvider>
+		<SafeAreaView style={styles.container}>
+			<View style={styles.headerContainer}>
+				<Text style={styles.headerText}>E x p l o r e</Text>
+			</View>
+			<View style={styles.trendingContainer}>
+				<Text style={styles.trendingText}>Trending</Text>
+				<FlatList
+					data={trendingBusinesses}
+					renderItem={renderItem}
+					keyExtractor={(item) => item.id.toString()}
+				/>
+			</View>
+			<View style={styles.topRatedContainer}>
+				<Text style={styles.topRatedText}>Top Rated</Text>
+				<FlatList
+					data={topRatedBusinesses}
+					renderItem={renderItem}
+					keyExtractor={(item) => item.id.toString()}
+				/>
+			</View>
+		</SafeAreaView>
 	);
 }
 
@@ -164,3 +163,5 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 	},
 });
+
+export default HomeScreen;

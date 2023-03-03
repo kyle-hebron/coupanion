@@ -37,7 +37,7 @@ function LoginScreen({ navigation }) {
 			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
 				<Text>Forgot password?</Text>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => navigation.navigate("Business")}>
+			<TouchableOpacity onPress={() => navigation.navigate("SignedIn")}>
 				<GradientTextButton text="Sign In" styles={styles} />
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
