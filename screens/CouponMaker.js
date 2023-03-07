@@ -5,10 +5,15 @@ import {
 	TextInput,
 	KeyboardAvoidingView,
 	TouchableOpacity,
+	SafeAreaView,
+	View,
+	TouchableWithoutFeedback,
+	Keyboard,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 const CouponMaker = ({ navigation }) => {
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -27,49 +32,50 @@ const CouponMaker = ({ navigation }) => {
 	};
 
 	return (
-		<KeyboardAvoidingView style={styles.container}>
-			<KeyboardAwareScrollView>
-				<KeyboardAvoidingView style={styles.secondContainer}>
-					<Icon
-						style={styles.fakeCoupon}
-						name="ticket-alt"
-						size={150}
-						color="white"
-					/>
-					<Icon style={styles.barCode} name="qrcode" size={60} color="white" />
-					<TextInput placeholder="discount" style={styles.input} />
-					<Icon
-						style={styles.percent}
-						name="percent"
-						size={20}
-						color="lightgrey"
-					/>
-					<TextInput placeholder="code" style={styles.code} />
-					<TextInput placeholder="title" style={styles.title} />
-					{/*<Button style={styles.date} title="Show Date Picker" onPress={showDatePicker} />*/}
-					<TouchableOpacity style={styles.date} onPress={showDatePicker}>
-						<Text styles={styles.dateText}>Expiration</Text>
-						<Icon
-							style={styles.calendar}
-							name="calendar-week"
-							size={17}
-							color="lightgray"
+		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+			<SafeAreaView style={styles.container}>
+				<KeyboardAvoidingView>
+					<Text style={styles.title}>Create a coupon</Text>
+					<View style={styles.qrSection}>
+						<Ionicons name={"qr-code-outline"} size={150} color={"white"} />
+						<View style={styles.qrSectionInput}>
+							<TextInput placeholder="title" style={styles.input} />
+							<TextInput placeholder="code" style={styles.input} />
+						</View>
+					</View>
+					<View style={styles.bottom}>
+						<TextInput
+							keyboardType="numeric"
+							placeholder="discount"
+							style={[styles.discount, styles.input]}
+							maxLength={3}
 						/>
-					</TouchableOpacity>
-					<DateTimePickerModal
-						isVisible={isDatePickerVisible}
-						mode="date"
-						maximumDate={new Date(20301229)}
-						minimumDate={new Date(19500101)}
-						onConfirm={handleConfirm}
-						onCancel={hideDatePicker}
-					/>
+
+						<TouchableOpacity style={styles.date} onPress={showDatePicker}>
+							<Icon
+								style={styles.calendar}
+								name="calendar-week"
+								size={25}
+								color="lightgray"
+							/>
+							<Text styles={styles.dateText}>Expiration</Text>
+						</TouchableOpacity>
+						<DateTimePickerModal
+							isVisible={isDatePickerVisible}
+							mode="date"
+							maximumDate={new Date(20301229)}
+							minimumDate={new Date(19500101)}
+							onConfirm={handleConfirm}
+							onCancel={hideDatePicker}
+						/>
+					</View>
+
 					<TouchableOpacity onPress={() => {}} style={styles.button}>
 						<Text styles={styles.buttonText}>Create</Text>
 					</TouchableOpacity>
 				</KeyboardAvoidingView>
-			</KeyboardAwareScrollView>
-		</KeyboardAvoidingView>
+			</SafeAreaView>
+		</TouchableWithoutFeedback>
 	);
 };
 
@@ -78,90 +84,62 @@ export default CouponMaker;
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: "#102C54",
-		justifyContent: "space-between",
-		alignItems: "center",
 		flex: 1,
 	},
-
-	secondContainer: {
-		backgroundColor: "#102C54",
-		width: 355,
-		height: 750,
-		borderColor: "white",
-		borderWidth: 5,
-		top: 60,
-	},
-
 	input: {
 		backgroundColor: "white",
-		paddingHorizontal: 80,
+		paddingHorizontal: 75,
 		paddingVertical: 15,
 		borderRadius: 100,
-		width: 220,
-		left: 70,
-		marginTop: 120,
+		textAlign: "center",
 	},
-
-	percent: {
-		bottom: 33,
-		left: 90,
+	qrSection: {
+		flexDirection: "row",
+		width: "100%",
+		justifyContent: "space-evenly",
+		marginTop: 5,
 	},
-
-	code: {
-		backgroundColor: "white",
-		paddingHorizontal: 90,
-		paddingVertical: 15,
-		borderRadius: 100,
-		width: 220,
-		left: 70,
+	qrSectionInput: {
+		flexDirection: "column",
+		justifyContent: "space-evenly",
+		//backgroundColor: "white",
 	},
-
 	title: {
-		backgroundColor: "white",
-		paddingHorizontal: 95,
-		paddingVertical: 15,
+		color: "white",
+		fontWeight: "bold",
+		fontSize: 36,
+		marginLeft: 15,
+		marginTop: 30,
 		borderRadius: 100,
-		width: 220,
-		left: 70,
-		top: 20,
 	},
-
+	bottom: {
+		alignItems: "center",
+		justifyContent: "center",
+		//marginLeft: 15,
+		flexDirection: "row",
+	},
 	button: {
 		borderRadius: 100,
-		paddingHorizontal: 95,
+		alignItems: "center",
 		paddingVertical: 20,
-		width: 240,
 		backgroundColor: "lightblue",
-		left: 60,
-		top: 110,
+		marginTop: 20,
+		padding: 25,
+		marginHorizontal: 10,
 	},
 
-	calendar: {
-		right: 55,
-		bottom: 18,
-	},
+	calendar: { marginRight: 15 },
 
 	date: {
 		borderRadius: 100,
-		paddingTop: 20,
-		paddingHorizontal: 75,
-		paddingVertical: 0,
-
-		width: 220,
+		textAlign: "center",
 		backgroundColor: "white",
-		left: 70,
-		top: 40,
-	},
-
-	barCode: {
-		top: 90,
-		left: 145,
-	},
-
-	fakeCoupon: {
-		top: 140,
+		alignItems: "center",
 		justifyContent: "center",
-		//right: 130,
-		transform: [{ rotate: "90deg" }],
+		flexDirection: "row",
+		padding: 10,
+		paddingHorizontal: 25,
+		marginLeft: 10,
 	},
+	discount: {},
 });

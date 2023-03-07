@@ -15,6 +15,7 @@ import {
 import { Linking } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import MapView from "react-native-maps";
 
 //import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
 //Yes, I know this is ugly -Kyle
@@ -60,23 +61,22 @@ export default function BusinessPage({ navigation }) {
 			<ScrollView>
 				<Text
 					style={{
-						fontSize: 69,
+						fontSize: 32,
 						textAlign: "left",
-						margin: 10,
+						margin: 0,
 						fontWeight: "bold",
 						color: "white",
-						paddingLeft: 25,
+						paddingLeft: 10,
 					}}
 				>
 					Profile
 				</Text>
 				<View style={styles.balloon}>
 					<Image source={require("../assets/wendy.png")} style={styles.logo} />
-					<View style={{ paddingHorizontal: 15, paddingTop: 20 }}>
+					<View style={{ paddingHorizontal: 15 }}>
 						<Text
 							style={{
-								alignItems: "left",
-								fontSize: 25,
+								fontSize: 20,
 								color: "white",
 								fontWeight: "bold",
 							}}
@@ -84,7 +84,7 @@ export default function BusinessPage({ navigation }) {
 							{users}
 						</Text>
 						<Text style={styles.name}>
-							{address}, {city}, {state}, {zip}{" "}
+							{address}, {city}, {state}, {zip}
 						</Text>
 						<Text
 							onPress={() => {
@@ -99,7 +99,7 @@ export default function BusinessPage({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={styles.balloon}>
+				<View style={{}}>
 					<View style={styles.couponPack}>
 						<Text style={{ fontSize: 75 }}>This is a placeholder</Text>
 					</View>
@@ -155,7 +155,12 @@ export default function BusinessPage({ navigation }) {
 					</View>
 				</View>
 
-				<View style={{ flexDirection: "row", paddingTop: 75 }}>
+				<Text style={styles.titles}>Find us</Text>
+				<View style={{ flex: 1, height: 250 }}>
+					<MapView style={styles.map} />
+				</View>
+
+				<View style={{ flexDirection: "row", marginTop: 50 }}>
 					<View style={styles.balloonWhite}>
 						<TouchableOpacity
 							style={styles.buttonGroup}
@@ -165,8 +170,8 @@ export default function BusinessPage({ navigation }) {
 						>
 							<Text
 								style={{
-									fontSize: 50,
-									textAlign: "auto",
+									fontSize: 36,
+									textAlign: "center",
 									color: "#102C54",
 									fontWeight: "bold",
 								}}
@@ -184,7 +189,7 @@ export default function BusinessPage({ navigation }) {
 						>
 							<Text
 								style={{
-									fontSize: 50,
+									fontSize: 36,
 									textAlign: "auto",
 									color: "#102C54",
 									fontWeight: "bold",
@@ -196,7 +201,7 @@ export default function BusinessPage({ navigation }) {
 					</View>
 				</View>
 
-				<View style={{ paddingTop: 75 }}>
+				<View style={{ marginTop: 15 }}>
 					<Text style={styles.titles}>Reviews</Text>
 					<View style={styles.balloonBackground}>
 						<View style={{ flexDirection: "row" }}>
@@ -265,29 +270,27 @@ export default function BusinessPage({ navigation }) {
 const styles = StyleSheet.create({
 	container: {
 		backgroundColor: "#102C54",
-		justifyContent: "center",
 		flex: 1,
 	},
 
 	logo: {
-		alignItems: "left",
 		width: 100,
 		height: 100,
-		borderRadius: 200 / 2,
+		borderRadius: 100,
 	},
 
 	name: {
-		alignItems: "left",
-		fontSize: 20,
+		fontSize: 15,
 		color: "white",
+		width: "90%",
 	},
 
 	balloon: {
-		paddingHorizontal: 35,
+		marginLeft: 10,
 		paddingTop: 10,
 		paddingBottom: 15,
-		borderRadius: 20,
 		flexDirection: "row",
+		alignItems: "center",
 	},
 
 	couponPack: {
@@ -302,16 +305,15 @@ const styles = StyleSheet.create({
 	buttonGroup: {
 		alignItems: "center",
 		width: "100%",
-		height: 45,
 
 		backgroundColor: "#ffffff",
+		borderRadius: 100,
 	},
 
 	balloonWhite: {
 		paddingHorizontal: 10,
 		paddingTop: 5,
 		paddingBottom: 15,
-		borderRadius: 20,
 		flexDirection: "row",
 		width: "50%",
 	},
@@ -322,6 +324,7 @@ const styles = StyleSheet.create({
 		paddingBottom: 15,
 		borderRadius: 20,
 		backgroundColor: "white",
+		marginTop: 10,
 	},
 
 	time: {
@@ -332,15 +335,16 @@ const styles = StyleSheet.create({
 
 	titles: {
 		alignItems: "left",
-		fontSize: 45,
+		fontSize: 32,
 		color: "white",
 		fontWeight: "bold",
-		paddingLeft: 15,
+		marginLeft: 10,
+		marginTop: 15,
 	},
 
 	openingTimes: {
 		flexDirection: "row",
-		paddingLeft: 45,
+		marginLeft: 10,
 	},
 
 	reviewText: {
@@ -355,5 +359,12 @@ const styles = StyleSheet.create({
 		textAlign: "auto",
 		color: "#102C54",
 		flexDirection: "row",
+	},
+	map: {
+		marginTop: 5,
+		width: "95%",
+		height: "100%",
+		alignSelf: "center",
+		borderRadius: 25,
 	},
 });
