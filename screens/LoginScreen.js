@@ -57,13 +57,13 @@ function LoginScreen({ navigation }) {
 			/>
 
 			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
-				<Text>Forgot password?</Text>
+				<Text style={{ color: "#949494" }}>Forgot password?</Text>
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => signInUser(username, password)}>
 				<GradientTextButton text="Sign In" styles={styles} />
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
-				<Text>
+				<Text style={{ color: "#949494" }}>
 					Don't have an account?{" "}
 					<Text style={{ fontWeight: "bold" }}>Sign Up</Text>
 				</Text>
@@ -76,7 +76,7 @@ function LoginScreen({ navigation }) {
 
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: "#A8E890",
+		backgroundColor: "#102C54",
 		alignItems: "center",
 		justifyContent: "center",
 		flex: 1,
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
 	},
 
 	logo: {
-		height: 50,
-		marginBottom: 15,
+		height: 40,
+		marginBottom: 25,
 		resizeMode: "contain",
 	},
 	text: {

@@ -8,7 +8,7 @@ export default function GradientTextButton(props) {
     <View style={styles.buttonGroup}>
       <LinearGradient
           style={styles.iconButton}
-          colors={['#A8E890', '#749F82']}
+          colors={['#102C54', '#0A1D38']}
           start={[0.0, 0.5]} end={[1.0, 0.5]} locations={[0.0, 1.0]}
       >
         <Text style={styles.text}>{text}</Text>

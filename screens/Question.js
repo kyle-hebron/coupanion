@@ -195,6 +195,7 @@ class Question extends Component {
 									textAlign: "center",
 									margin: 10,
 									fontWeight: "bold",
+									color: "#FFFFFF"
 								}}
 							>
 								Welcome to Coupanion
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "#A8E890",
+		backgroundColor: "#102C54",
 	},
 	innerContainer: {
 		justifyContent: "center",

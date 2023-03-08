@@ -61,7 +61,7 @@ export default function BusinessRegister({navigation}){
 
                 }, {merge: true});
 
-                navigation.navigate('CouponMaker');
+                navigation.navigate("SignedIn");
 
 
             } else {
@@ -76,7 +76,7 @@ export default function BusinessRegister({navigation}){
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#A8E890',
+        backgroundColor: '#102C54',
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1
@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         marginTop: '5%',
         marginLeft: 2,
-        marginBottom: 5
+        marginBottom: 5,
+        color: '#FFFFFF',
     },
     profileIcon: {
         alignSelf: 'center',

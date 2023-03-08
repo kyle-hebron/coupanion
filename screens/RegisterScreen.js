@@ -69,7 +69,7 @@ export default function RegisterScreen({ route, navigation }) {
 					style={styles.profileIcon}
 					name="user-circle"
 					size={120}
-					color="#000"
+					color="#FFF"
 				/>
 				<TouchableOpacity onPress={PickImage} style={styles.uploadText}>
 					<Text style={styles.uploadText}>Upload Profile Picture</Text>
@@ -172,7 +172,7 @@ export default function RegisterScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: "#A8E890",
+		backgroundColor: "#102C54",
 		justifyContent: "space-between",
 		alignItems: "center",
 		flex: 1,
@@ -195,5 +195,6 @@ const styles = StyleSheet.create({
 		alignSelf: "center",
 		marginTop: 5,
 		marginBottom: 15,
+		color: "#949494",
 	},
 });

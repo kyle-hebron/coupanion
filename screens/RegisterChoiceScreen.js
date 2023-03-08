@@ -15,7 +15,7 @@ function RegisterChoiceScreen({navigation}){
                 style={styles.logo}
                 source={require("../assets/Logo.png")}
             />
-            <Text>Signing up as a...</Text>
+            <Text style={{ color: "#949494" }}>Signing up as a...</Text>
 
             <TouchableOpacity
                 onPress={() => {
@@ -26,7 +26,7 @@ function RegisterChoiceScreen({navigation}){
                 <View style={styles.buttonGroup}>
                     <LinearGradient
                         style={styles.iconButton}
-                        colors={['#A8E890', '#749F82']}
+                        colors={['#102C54', '#0A1D38']}
                         start={[0.0, 0.5]} end={[1.0, 0.5]} locations={[0.0, 1.0]}
                     >
                         <Icon style={styles.icon} name="user-circle" size={30} color="#FFF" />
@@ -44,7 +44,7 @@ function RegisterChoiceScreen({navigation}){
                 <View style={styles.buttonGroup}>
                     <LinearGradient
                         style={styles.iconButton}
-                        colors={['#A8E890', '#749F82']}
+                        colors={['#102C54', '#0A1D38']}
                         start={[0.0, 0.5]} end={[1.0, 0.5]} locations={[0.0, 1.0]}
                     >
                         <Icon style={styles.icon} name="building" size={30} color="#FFF" />
@@ -64,7 +64,7 @@ function RegisterChoiceScreen({navigation}){
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#A8E890',
+        backgroundColor: '#102C54',
         justifyContent: 'center',
         alignItems: 'center',
         flex: 1
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
         padding: 20
     },
     logo: {
-        height: 50,
-        marginBottom: 15,
+        height: 40,
+        marginBottom: 25,
         resizeMode: 'contain'
     },
     iconButton: {

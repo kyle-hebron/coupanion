@@ -9,7 +9,7 @@ export default function GradientIconButton(props) {
     <View style={styles.buttonGroup}>
         <LinearGradient
             style={styles.button}
-            colors={['#A8E890', '#749F82']}
+            colors={['#102C54', '#0A1D38']}
             start={[0.0, 0.5]} end={[1.0, 0.5]} locations={[0.0, 1.0]}
         >
             <Icon style={styles.icon} name={icon} size={size} color={color} />
