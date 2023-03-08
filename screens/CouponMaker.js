@@ -67,6 +67,7 @@ const CouponMaker = ({ navigation }) => {
 							minimumDate={new Date(19500101)}
 							onConfirm={handleConfirm}
 							onCancel={hideDatePicker}
+							display="inline"
 						/>
 					</View>
 
