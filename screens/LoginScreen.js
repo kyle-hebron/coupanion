@@ -1,4 +1,6 @@
-import React, { Component, useState } from "react";
+import { onAuthStateChanged, signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { doc, DocumentSnapshot, getDoc } from "firebase/firestore";
+import React, { Component, useState, useEffect } from "react";
 import {
 	StyleSheet,
 	Text,
@@ -12,10 +14,30 @@ import {
 
 import GradientTextButton from "../components/GradientTextButton";
 import IconInput from "../components/IconInput";
+import { auth, db } from "../firebase";
 
 function LoginScreen({ navigation }) {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
+  	const [user, setUser] = useState();
+	const [userData, setUserdata] = useState({})
+	const [error, setError] = useState("")
+
+	const auth = getAuth();
+
+	function signInUser(username, password){
+		signInWithEmailAndPassword(auth, username, password)
+		.then((userCredential) => {
+			// Signed in 
+			const user = userCredential.user;
+			navigation.navigate("SignedIn");
+			// ...
+		})
+		.catch((error) => {
+			const errorCode = error.code;
+			const errorMessage = error.message;
+		});
+	}
 
 	return (
 		<KeyboardAvoidingView style={styles.container}>
@@ -37,7 +59,7 @@ function LoginScreen({ navigation }) {
 			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
 				<Text>Forgot password?</Text>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => navigation.navigate("SignedIn")}>
+			<TouchableOpacity onPress={() => signInUser(username, password)}>
 				<GradientTextButton text="Sign In" styles={styles} />
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
@@ -48,6 +70,8 @@ function LoginScreen({ navigation }) {
 			</TouchableOpacity>
 		</KeyboardAvoidingView>
 	);
+
+
 }
 
 const styles = StyleSheet.create({
