@@ -1,4 +1,5 @@
 import React, { Component, useRef, useEffect, useState } from "react";
+import Icon from "react-native-vector-icons/FontAwesome5";
 import {
 	StyleSheet,
 	Text,
@@ -27,9 +28,8 @@ export default function BusinessPage({ navigation }) {
 	const [number, setNumber] = useState(" ");
 	const [zip, setZip] = useState(" ");
 	const [state, setState] = useState(" ");
-	const [pic, setPic] = useState(" ");
-	const route = useRoute();
-	const id = route.params?.id;
+	const [pfp, setPfp] = useState(" ");
+	//const [pic, setPic] = useState(" ");
 
 	useEffect(() => {
 		async function fetchData() {
@@ -37,21 +37,23 @@ export default function BusinessPage({ navigation }) {
 			const querySnapshot = await getDocs(q);
 			const users = [];
 			querySnapshot.forEach((doc) => {
-				if (doc.id === id) {
-					const owner = doc.data().owner;
-					const address = doc.data().address1;
-					const city = doc.data().city;
+				if (doc.id === "IoIspE5aFdStSZdxETqUWLU10sS2") {
+					const business = doc.data().business;
+					const address = doc.data().AddressInfo.address1;
+					const city = doc.data().AddressInfo.city;
 					const number = doc.data().phone;
-					const zip = doc.data().zip;
-					const state = doc.data().state;
+					const zip = doc.data().AddressInfo.zip;
+					const state = doc.data().AddressInfo.state;
+					const pfp = doc.data().pfp;
 					//const pic = doc.data().pic;
 
-					setUsers(owner);
+					setUsers(business);
 					setAddress(address);
 					setCity(city);
 					setNumber(number);
 					setZip(zip);
 					setState(state);
+					setPfp(pfp);
 					//setPic(pic);
 				}
 			});
@@ -75,7 +77,7 @@ export default function BusinessPage({ navigation }) {
 					Profile
 				</Text>
 				<View style={styles.balloon}>
-					<Image source={require("../assets/wendy.png")} style={styles.logo} />
+					<Image source={require("../assets/logos/wendy.png")} style={styles.logo} />
 					<View style={{ paddingHorizontal: 15 }}>
 						<Text
 							style={{
@@ -87,7 +89,10 @@ export default function BusinessPage({ navigation }) {
 							{users}
 						</Text>
 						<Text style={styles.name}>
-							{address}, {city}, {state}, {zip}
+							{address}
+						</Text>
+						<Text style={styles.name}>
+							{city}, {state}, {zip}
 						</Text>
 						<Text
 							onPress={() => {
@@ -102,16 +107,22 @@ export default function BusinessPage({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={{}}>
+				<View style={{alignItems: "center"}}>
 					<View style={styles.couponPack}>
-						<Text style={{ fontSize: 75 }}>This is a placeholder</Text>
+						<Icon style={styles.icon} name="qrcode" size={50} color="#000"/>
+						<Text style={{ fontSize: 40, textAlign: "center" }}>Coupon #1</Text>
+					</View>
+					<View style={styles.couponPack}>
+						<Icon style={styles.icon} name="qrcode" size={50} color="#000"/>
+						<Text style={{ fontSize: 40, textAlign: "center" }}>Coupon #2</Text>
 					</View>
 				</View>
+
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
 					onPress={() => {
-						alert("No coupons available");
+						alert("No other coupons available");
 					}}
 				>
 					<Text style={{ fontSize: 15, color: "white", paddingHorizontal: 25 }}>
@@ -119,11 +130,11 @@ export default function BusinessPage({ navigation }) {
 					</Text>
 				</TouchableOpacity>
 
-				<View style={{ flexDirection: "column" }}>
+				<View style={{flexDirection: "column", marginBottom: 10}}>
 					<Text style={styles.titles}>Hours:</Text>
 					<View style={styles.openingTimes}>
 						<Text style={styles.time}>Sunday </Text>
-						<Text> </Text>
+						
 						<Text style={styles.time}>6:30AM - 12:00AM</Text>
 					</View>
 					<View style={styles.openingTimes}>
@@ -204,7 +215,7 @@ export default function BusinessPage({ navigation }) {
 					</View>
 				</View>
 
-				<View style={{ marginTop: 15 }}>
+				<View style={{ marginTop: 15, alignItems: "center"}}>
 					<Text style={styles.titles}>Reviews</Text>
 					<View style={styles.balloonBackground}>
 						<View style={{ flexDirection: "row" }}>
@@ -232,9 +243,7 @@ export default function BusinessPage({ navigation }) {
 							watch what was happening.{" "}
 						</Text>
 					</View>
-				</View>
 
-				<View style={{ paddingTop: 25 }}>
 					<View style={styles.balloonBackground}>
 						<View style={{ flexDirection: "row" }}>
 							<Text style={styles.reviewName}>Brian Riggers</Text>
@@ -256,12 +265,12 @@ export default function BusinessPage({ navigation }) {
 				</View>
 
 				<TouchableOpacity
-					style={{ paddingTop: 10, flexDirection: "row-reverse" }}
+					style={{ flexDirection: "row-reverse" }}
 					onPress={() => {
 						alert("No other reviews");
 					}}
 				>
-					<Text style={{ fontSize: 15, color: "white", paddingHorizontal: 25 }}>
+					<Text style={{ fontSize: 15, color: "white", paddingHorizontal: 25, marginBottom: 10 }}>
 						View all
 					</Text>
 				</TouchableOpacity>
@@ -285,11 +294,11 @@ const styles = StyleSheet.create({
 	name: {
 		fontSize: 15,
 		color: "white",
-		width: "90%",
+		width: "100%",
 	},
 
 	balloon: {
-		marginLeft: 10,
+		marginLeft: 15,
 		paddingTop: 10,
 		paddingBottom: 15,
 		flexDirection: "row",
@@ -297,12 +306,16 @@ const styles = StyleSheet.create({
 	},
 
 	couponPack: {
-		paddingHorizontal: 35,
+		justifyContent: 'space-between',
+		paddingHorizontal: 20,
 		paddingTop: 10,
 		paddingBottom: 15,
+		marginBottom: 10,
 		borderRadius: 20,
-		flexDirection: "row",
-		alignContent: "center",
+		width: "90%",
+		flexDirection: 'row',
+		alignItems: "center",
+		backgroundColor: "white",
 	},
 
 	buttonGroup: {
@@ -327,7 +340,8 @@ const styles = StyleSheet.create({
 		paddingBottom: 15,
 		borderRadius: 20,
 		backgroundColor: "white",
-		marginTop: 10,
+		marginBottom: 10,
+		width: "90%",
 	},
 
 	time: {
@@ -343,11 +357,15 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		marginLeft: 10,
 		marginTop: 15,
+		marginBottom: 10,
 	},
 
 	openingTimes: {
+		justifyContent: 'space-between',
 		flexDirection: "row",
+		paddingHorizontal: 20,
 		marginLeft: 10,
+		marginRight: 10,
 	},
 
 	reviewText: {
