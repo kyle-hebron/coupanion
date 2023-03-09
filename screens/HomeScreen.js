@@ -26,7 +26,7 @@ function HomeScreen({ navigation }) {
         const data = doc.data();
         businesses.push({
           id: doc.id,
-          name: data.username,
+          name: data.business,
           tag: data.tag,
           image: { uri: data.image },
         });
@@ -44,7 +44,7 @@ function HomeScreen({ navigation }) {
         const data = doc.data();
         businesses.push({
           id: doc.id,
-          name: data.username,
+          name: data.business,
           tag: data.tag,
           image: { uri: data.image },
         });
