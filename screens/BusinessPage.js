@@ -30,6 +30,8 @@ export default function BusinessPage({ navigation }) {
 	const [state, setState] = useState(" ");
 	const [pfp, setPfp] = useState(" ");
 	//const [pic, setPic] = useState(" ");
+	const route = useRoute();
+	const id = route.params?.id;
 
 	useEffect(() => {
 		async function fetchData() {
@@ -37,7 +39,7 @@ export default function BusinessPage({ navigation }) {
 			const querySnapshot = await getDocs(q);
 			const users = [];
 			querySnapshot.forEach((doc) => {
-				if (doc.id === "IoIspE5aFdStSZdxETqUWLU10sS2") {
+				if (doc.id === id) {
 					const business = doc.data().business;
 					const address = doc.data().AddressInfo.address1;
 					const city = doc.data().AddressInfo.city;
