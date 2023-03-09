@@ -59,7 +59,7 @@ function HomeScreen({ navigation }) {
   }, []);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => navigation.navigate("Business")}>
+    <TouchableOpacity onPress={() => navigation.navigate("Business", {id: item.id})}>
       <View style={styles.item}>
         <Image source={item.image} style={styles.logo} />
         <View style={styles.nameContainer}>

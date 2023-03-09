@@ -12,6 +12,7 @@ import {
 	Button,
 	GradientTextButton,
 } from "react-native";
+import { useRoute } from "@react-navigation/native"
 import { Linking } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
@@ -27,6 +28,8 @@ export default function BusinessPage({ navigation }) {
 	const [zip, setZip] = useState(" ");
 	const [state, setState] = useState(" ");
 	const [pic, setPic] = useState(" ");
+	const route = useRoute();
+	const id = route.params?.id;
 
 	useEffect(() => {
 		async function fetchData() {
@@ -34,7 +37,7 @@ export default function BusinessPage({ navigation }) {
 			const querySnapshot = await getDocs(q);
 			const users = [];
 			querySnapshot.forEach((doc) => {
-				if (doc.id === "FcG7W99f30VRqgKSQ5Im") {
+				if (doc.id === id) {
 					const owner = doc.data().owner;
 					const address = doc.data().address1;
 					const city = doc.data().city;
@@ -88,7 +91,7 @@ export default function BusinessPage({ navigation }) {
 						</Text>
 						<Text
 							onPress={() => {
-								Linking.openURL(num);
+								Linking.openURL(number);
 							}}
 							style={styles.name}
 						>
