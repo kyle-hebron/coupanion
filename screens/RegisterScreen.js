@@ -8,7 +8,7 @@ import {
 	TextInput,
 	KeyboardAvoidingView,
 	TouchableOpacity,
-	Platform,
+	
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import * as ImagePicker from "expo-image-picker";
@@ -34,19 +34,24 @@ export default function RegisterScreen({ route, navigation }) {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [error, setError] = useState("");
 	const [image, setImage] = useState(null);
-	const PickImage = async () => {
-		let result = ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.All,
-			allowsEditing: true,
-			aspect: [4, 3],
-			quality: 1,
-		});
-		console.log(result);
+	const [selectedImage, setSelectedImage] = useState(null);
+
+	const pickImage = async () => {
+		// No permissions request is necessary for launching the image library
+		let result = await ImagePicker.launchImageLibraryAsync({
+		  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+		  allowsEditing: true
+		 
+		})
+
+		
 
 		if (!result.canceled) {
-			setImage(result.uri);
+			setImage(result.assets[0].uri);
 		}
-	};
+	}
+
+	
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -65,15 +70,27 @@ export default function RegisterScreen({ route, navigation }) {
 				</TouchableOpacity>
 			</View>
 			<View styles={styles.middle}>
-				<Icon
-					style={styles.profileIcon}
+				
+
+			<TouchableOpacity onPress={pickImage}>
+				<Icon style={styles.profileIcon}
 					name="user-circle"
 					size={120}
 					color="#FFF"
+
 				/>
-				<TouchableOpacity onPress={PickImage} style={styles.uploadText}>
-					<Text style={styles.uploadText}>Upload Profile Picture</Text>
-				</TouchableOpacity>
+				{image && <Image source={{ uri: image }} style={{
+						width: 120,
+						height: 120,
+						alignSelf: 'center',
+						position: 'absolute',
+						borderRadius: 120/2
+				}} />}
+			</TouchableOpacity>
+
+				
+			<Text style={styles.uploadText}>Upload Profile Picture</Text>
+
 				<IconInput
 					icon="user-circle"
 					text="Username"
@@ -154,6 +171,7 @@ export default function RegisterScreen({ route, navigation }) {
 			onAuthStateChanged(auth, (user) => {
 				if (user) {
 					setDoc(doc(db, "Business people", user.uid), {
+						
 						uid: user.uid,
 						username: username,
 						email: email,
@@ -190,6 +208,7 @@ const styles = StyleSheet.create({
 	},
 	profileIcon: {
 		alignSelf: "center",
+		
 	},
 	uploadText: {
 		alignSelf: "center",
