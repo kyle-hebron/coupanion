@@ -1,15 +1,16 @@
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
+import HomeScreen from "../screens/HomeScreen";
 import BusinessPage from "../screens/BusinessPage";
-import SearchScreen from "../screens/CouponMaker";
-import BusinessProfileScreen from "../screens/BusinessProfileScreen";
+import SearchScreen from "../screens/SearchScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 
 import { getData } from "../components/UserDefaults";
 
 const Tab = createBottomTabNavigator();
 
-function BottomTabNavigator() {
+function BottomTabNavigatorUser() {
 	return (
 		<Tab.Navigator
 			screenOptions={({ route }) => ({
@@ -19,10 +20,10 @@ function BottomTabNavigator() {
 
 					if (route.name === "Home") {
 						iconName = focused ? "home" : "home-outline";
-					} else if (route.name === "CouponMaker") {
-						iconName = focused ? "add-circle" : "add-circle-outline";
 					} else if (route.name === "Profile") {
 						iconName = focused ? "person-circle" : "person-circle-outline";
+					} else if (route.name === "Search") {
+						iconName = focused ? "search-outline" : "search";
 					}
 
 					return <Ionicons name={iconName} size={size} color={color} />;
@@ -32,10 +33,11 @@ function BottomTabNavigator() {
 			})}
 			initialRouteName="Home"
 		>
-			<Tab.Screen name="CouponMaker" component={CouponMaker} />
-			<Tab.Screen name="Profile" component={BusinessProfileScreen} />
+			<Tab.Screen name="Home" component={HomeScreen} />
+			<Tab.Screen name="Search" component={SearchScreen} />
+			<Tab.Screen name="Profile" component={ProfileScreen} />
 		</Tab.Navigator>
 	);
 }
 
-export default BottomTabNavigator;
+export default BottomTabNavigatorUser;

@@ -7,6 +7,9 @@ import BusinessRegister from "../screens/BusinessRegister";
 import Question from "../screens/Question";
 
 import BottomTabNavigator from "./BottomTabNavigator";
+import BottomTabNavigatorUser from "./BottomTabNavigatorUser";
+
+import { getData } from "../components/UserDefaults";
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +26,14 @@ function AuthNavigator() {
 			<Stack.Screen name="Register" component={RegisterScreen} />
 			<Stack.Screen name="BusinessRegister" component={BusinessRegister} />
 			<Stack.Screen name="Question" component={Question} />
-			<Stack.Screen name="SignedIn" component={BottomTabNavigator} />
+			<Stack.Screen
+				name="SignedIn"
+				component={
+					getData("@isBusiness") == "true"
+						? BottomTabNavigator
+						: BottomTabNavigatorUser
+				}
+			/>
 		</Stack.Navigator>
 	);
 }

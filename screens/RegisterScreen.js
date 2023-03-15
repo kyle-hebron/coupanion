@@ -1,18 +1,14 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
 	StyleSheet,
 	Text,
 	View,
 	SafeAreaView,
 	Image,
-	TextInput,
-	KeyboardAvoidingView,
 	TouchableOpacity,
-	
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import * as ImagePicker from "expo-image-picker";
-import Constants from "expo-constants";
 
 import { auth, db } from "../firebase";
 import {
@@ -24,7 +20,7 @@ import { doc, setDoc } from "firebase/firestore";
 import GradientIconButton from "../components/GradientIconButton";
 import GradientTextButton from "../components/GradientTextButton";
 import IconInput from "../components/IconInput";
-import { setStatusBarBackgroundColor } from "expo-status-bar";
+import { storeData } from "../components/UserDefaults";
 
 export default function RegisterScreen({ route, navigation }) {
 	const { isBusiness } = route.params;
@@ -39,19 +35,14 @@ export default function RegisterScreen({ route, navigation }) {
 	const pickImage = async () => {
 		// No permissions request is necessary for launching the image library
 		let result = await ImagePicker.launchImageLibraryAsync({
-		  mediaTypes: ImagePicker.MediaTypeOptions.Images,
-		  allowsEditing: true
-		 
-		})
-
-		
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			allowsEditing: true,
+		});
 
 		if (!result.canceled) {
 			setImage(result.assets[0].uri);
 		}
-	}
-
-	
+	};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -70,26 +61,28 @@ export default function RegisterScreen({ route, navigation }) {
 				</TouchableOpacity>
 			</View>
 			<View styles={styles.middle}>
-				
+				<TouchableOpacity onPress={pickImage}>
+					<Icon
+						style={styles.profileIcon}
+						name="user-circle"
+						size={120}
+						color="#FFF"
+					/>
+					{image && (
+						<Image
+							source={{ uri: image }}
+							style={{
+								width: 120,
+								height: 120,
+								alignSelf: "center",
+								position: "absolute",
+								borderRadius: 120 / 2,
+							}}
+						/>
+					)}
+				</TouchableOpacity>
 
-			<TouchableOpacity onPress={pickImage}>
-				<Icon style={styles.profileIcon}
-					name="user-circle"
-					size={120}
-					color="#FFF"
-
-				/>
-				{image && <Image source={{ uri: image }} style={{
-						width: 120,
-						height: 120,
-						alignSelf: 'center',
-						position: 'absolute',
-						borderRadius: 120/2
-				}} />}
-			</TouchableOpacity>
-
-				
-			<Text style={styles.uploadText}>Upload Profile Picture</Text>
+				<Text style={styles.uploadText}>Upload Profile Picture</Text>
 
 				<IconInput
 					icon="user-circle"
@@ -118,11 +111,7 @@ export default function RegisterScreen({ route, navigation }) {
 			</View>
 			<View styles={styles.bottom}>
 				<TouchableOpacity
-					onPress={() =>
-						isBusiness
-							? signUpBusiness(username, password, confirmPassword, email)
-							: signUpUser(username, password, confirmPassword, email)
-					}
+					onPress={() => signUpUser(username, password, confirmPassword, email)}
 				>
 					<GradientTextButton
 						text={isBusiness ? "Next" : "Sign Up"}
@@ -135,7 +124,7 @@ export default function RegisterScreen({ route, navigation }) {
 	);
 
 	function signUpUser(username, password, confirmPassword, email) {
-		if (password === confirmPassword) {
+		if (password === confirmPassword && password != "") {
 			createUserWithEmailAndPassword(auth, email, password)
 				.then((res) => {
 					console.log(res.user);
@@ -144,39 +133,24 @@ export default function RegisterScreen({ route, navigation }) {
 				.catch((err) => setError(err.message));
 			onAuthStateChanged(auth, (user) => {
 				if (user) {
-					setDoc(doc(db, "users", user.uid), {
-						uid: user.uid,
-						username: username,
-						email: email,
-					});
-					navigation.navigate("Question");
-				} else {
-					//console.log("No user logged in")
-					//setError("No user logged in")
-				}
-			});
-		} else {
-			setError("Passwords do not match");
-		}
-	}
-
-	function signUpBusiness(username, password, confirmPassword, email) {
-		if (password === confirmPassword) {
-			createUserWithEmailAndPassword(auth, email, password)
-				.then((res) => {
-					console.log(res.user);
-					setError("");
-				})
-				.catch((err) => setError(err.message));
-			onAuthStateChanged(auth, (user) => {
-				if (user) {
-					setDoc(doc(db, "Business people", user.uid), {
-						
-						uid: user.uid,
-						username: username,
-						email: email,
-					});
-					navigation.navigate("BusinessRegister");
+					//If they're a business, register as a business
+					if (isBusiness) {
+						setDoc(doc(db, "Business people", user.uid), {
+							uid: user.uid,
+							username: username,
+							email: email,
+						});
+						storeData("@isBusiness", "true");
+						navigation.navigate("BusinessRegister");
+					} else {
+						setDoc(doc(db, "users", user.uid), {
+							uid: user.uid,
+							username: username,
+							email: email,
+						});
+						storeData("@isBusiness", "false");
+						navigation.navigate("Question");
+					}
 				} else {
 					//console.log("No user logged in")
 					//setError("No user logged in")
@@ -208,7 +182,6 @@ const styles = StyleSheet.create({
 	},
 	profileIcon: {
 		alignSelf: "center",
-		
 	},
 	uploadText: {
 		alignSelf: "center",

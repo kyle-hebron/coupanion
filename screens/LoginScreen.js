@@ -1,6 +1,13 @@
-import { onAuthStateChanged, signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import {
+	onAuthStateChanged,
+	signInWithEmailAndPassword,
+	getAuth,
+} from "firebase/auth";
 import { doc, DocumentSnapshot, getDoc } from "firebase/firestore";
 import React, { Component, useState, useEffect } from "react";
+
+import { storeData } from "../components/UserDefaults";
+
 import {
 	StyleSheet,
 	Text,
@@ -15,28 +22,34 @@ import {
 import GradientTextButton from "../components/GradientTextButton";
 import IconInput from "../components/IconInput";
 import { auth, db } from "../firebase";
+import { isBusiness } from "../Helpers/dbHelper";
 
 function LoginScreen({ navigation }) {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-  	const [user, setUser] = useState();
-	const [userData, setUserdata] = useState({})
-	const [error, setError] = useState("")
+	const [user, setUser] = useState();
+	const [userData, setUserdata] = useState({});
+	const [error, setError] = useState("");
 
 	const auth = getAuth();
 
-	function signInUser(username, password){
+	function signInUser(username, password) {
 		signInWithEmailAndPassword(auth, username, password)
-		.then((userCredential) => {
-			// Signed in 
-			const user = userCredential.user;
-			navigation.navigate("SignedIn");
-			// ...
-		})
-		.catch((error) => {
-			const errorCode = error.code;
-			const errorMessage = error.message;
-		});
+			.then((userCredential) => {
+				// Signed in
+				const user = userCredential.user;
+				console.log("here");
+				if (isBusiness(auth.currentUser.uid)) {
+					storeData("@isBusiness", "true");
+				} else {
+					storeData("@isBusiness", "false");
+				}
+				navigation.navigate("SignedIn");
+			})
+			.catch((error) => {
+				const errorCode = error.code;
+				const errorMessage = error.message;
+			});
 	}
 
 	return (
@@ -70,8 +83,6 @@ function LoginScreen({ navigation }) {
 			</TouchableOpacity>
 		</KeyboardAvoidingView>
 	);
-
-
 }
 
 const styles = StyleSheet.create({
