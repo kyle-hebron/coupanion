@@ -5,6 +5,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import RegisterChoiceScreen from "../screens/RegisterChoiceScreen";
 import BusinessRegister from "../screens/BusinessRegister";
 import Question from "../screens/Question";
+import ListScreen from "../screens/ListScreen";
 
 import BottomTabNavigator from "./BottomTabNavigator";
 import BottomTabNavigatorUser from "./BottomTabNavigatorUser";
@@ -26,6 +27,7 @@ function AuthNavigator() {
 			<Stack.Screen name="Register" component={RegisterScreen} />
 			<Stack.Screen name="BusinessRegister" component={BusinessRegister} />
 			<Stack.Screen name="Question" component={Question} />
+			<Stack.Screen name="ListScreen" component={ListScreen} />
 			<Stack.Screen
 				name="SignedIn"
 				component={
