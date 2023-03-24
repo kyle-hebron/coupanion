@@ -1,102 +1,39 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { View, Text, FlatList, SafeAreaView, StyleSheet, Image, TextInput} from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, FlatList, SafeAreaView, StyleSheet, Image, TextInput, Button} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function ListScreen({navigation}) {
-    const business = [
-        {
-            id: 1,
-            name: "Porto's Bakery",
-            tag: 'Bakery',
-            rating: '90%',
-            miles: '1.1mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/portos.png')
-        },
-        {
-            id: 2,
-            name: "Anne's Pastries",
-            tag: 'Bakery',
-            rating: '75%',
-            miles: '1.5mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/restuarant.png')
-        },
-        {
-            id: 3,
-            name: "The Italian",
-            tag: 'Restaurant',
-            rating: '80%',
-            miles: '1.8mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/company.png')
-        },
-        {
-            id: 4,
-            name: "Pizza Palace",
-            tag: 'Restaurant',
-            rating: '60%',
-            miles: '0.6mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/pizza.png')
-        },
-        {
-            id: 5,
-            name: "Olive Garden",
-            tag: 'Restaurant',
-            rating: '45%',
-            miles: '2.2mi',
-            thumb: require('../../assets/thumbDown.png'),
-            image: require('../../assets/logos/olive.png')
-        },
-        {
-            id: 6,
-            name: "Lily's Flowers",
-            tag: 'Shop',
-            rating: '85%',
-            miles: '1.5mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/flower.jpg')
-        },
-        {
-            id: 7,
-            name: "Jollibee",
-            tag: 'Fast Food',
-            rating: '70%',
-            miles: '3.4mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/Jolibee.png')
-        },
-        {
-            id: 8,
-            name: "Spicy Thai",
-            tag: 'Reastaurant',
-            rating: '65%',
-            miles: '2.6mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/thai.png')
-        },
-        {
-            id: 9,
-            name: "Mexican Grill",
-            tag: 'Restuarant',
-            rating: '75%',
-            miles: '4.1mi',
-            thumb: require('../../assets/thumbUp.png'),
-            image: require('../../assets/logos/mexican.jpg')
-        },
-        {
-            id: 10,
-            name: "McDonalds",
-            tag: 'Fast Food',
-            rating: '30%',
-            miles: '0.3mi',
-            thumb: require('../../assets/thumbDown.png'),
-            image: require('../../assets/logos/mcdonalds.png')
-        },
-    ];
+    
+
+    
     const [input, setInput] = useState("");
+    const business = [];
+    async function search() {
+        const q = query(collection(db, "Business people"), where("business", "==", "Wendy's"));
+        const x = query(collection(db, "Business people"), where("tags", 'array-contains', input));
+        let i = 0;
+        const querySnapshot = await getDocs(q);
+        const qSnap = await getDocs(x);
+        
+        const users = [];
+        querySnapshot.forEach((doc) => {
+            business[i] = doc.data();
+            i++;
+        })
+        
+    
+        qSnap.forEach((doc) => {
+            business[i] = doc.data();
+            i++;
+        });
+        console.log("hello");
+        console.log(business[1]);
+        
+    } 
+
     return(
         <SafeAreaView style={styles.container}>
             <View style={styles.textInput}>
@@ -105,6 +42,9 @@ export default function ListScreen({navigation}) {
             inlineImageLeft='search_icon'
             placeholder="Search Businesses"/>
             </View>
+           
+            
+            
             <FlatList
             data={business.sort((a, b) => a.name.localeCompare(b.name))}
             renderItem = {({item}) => {
