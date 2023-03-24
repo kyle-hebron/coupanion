@@ -12,7 +12,7 @@ export default function ListScreen({navigation}) {
     const [input, setInput] = useState("");
     const business = [];
     async function search() {
-        const q = query(collection(db, "Business people"), where("business", "==", "Wendy's"));
+        const q = query(collection(db, "Business people"), where("business", "==", input));
         const x = query(collection(db, "Business people"), where("tags", 'array-contains', input));
         let i = 0;
         const querySnapshot = await getDocs(q);
@@ -29,8 +29,7 @@ export default function ListScreen({navigation}) {
             business[i] = doc.data();
             i++;
         });
-        console.log("hello");
-        console.log(business[1]);
+
         
     } 
 
