@@ -30,6 +30,9 @@ export default function BusinessProfileScreen({ navigation }) {
 	const [state, setState] = useState(" ");
 	const [pfp, setPfp] = useState(" ");
 	//const [pic, setPic] = useState(" ");
+	const [countUp, setCountUp] = useState(0); // For rating .
+	const [countDown, setCountDown] = useState(0); // For rating .
+	const [selected, setSelected] = useState(null); // For rating .
 	const route = useRoute();
 	const id = route.params?.id;
 
@@ -62,6 +65,31 @@ export default function BusinessProfileScreen({ navigation }) {
 		}
 		fetchData();
 	}, []);
+	
+	// A function to handle upvotes and downvotes , and to update the count of each accordingly .
+	const handleVote = (type) => {
+  		if (type === selected) {
+    			setSelected(null);
+    			if (type === "up") {
+      				setCountUp(countUp - 1);
+    			} else {
+      				setCountDown(countDown - 1);
+    			}
+  		} else {
+    			setSelected(type);
+    			if (type === "up") {
+      				setCountUp(countUp + 1);
+      				if (selected === "down") {
+        				setCountDown(countDown - 1);
+      				}
+    			} else {
+      				setCountDown(countDown + 1);
+      				if (selected === "up") {
+        				setCountUp(countUp - 1);
+      				}
+    			}
+  		}
+	};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -217,8 +245,28 @@ export default function BusinessProfileScreen({ navigation }) {
 					</View>
 				</View>
 
+				<Text style={styles.titles}>Rating and Reviews</Text>
+
+				<View style={styles.rating}>
+  					<TouchableOpacity onPress={() => handleVote("up")}>
+    						<Icon
+      							name="thumbs-up"
+      							size={35}
+      							color={selected === "up" ? "green" : "black"}
+    						/>
+  					</TouchableOpacity>
+  					<Text style={styles.count}>{countUp}</Text>
+  					<TouchableOpacity onPress={() => handleVote("down")}>
+    						<Icon
+      							name="thumbs-down"
+      							size={35}
+      							color={selected === "down" ? "red" : "black"}
+    						/>
+  					</TouchableOpacity>
+  					<Text style={styles.count}>{countDown}</Text>
+				</View>
+
 				<View style={{ marginTop: 15, alignItems: "center" }}>
-					<Text style={styles.titles}>Reviews</Text>
 					<View style={styles.balloonBackground}>
 						<View style={{ flexDirection: "row" }}>
 							<Text style={styles.reviewName}>Kristen</Text>
@@ -360,11 +408,10 @@ const styles = StyleSheet.create({
 	},
 
 	titles: {
-		alignItems: "left",
+		textAlign: 'center',
 		fontSize: 32,
 		color: "white",
 		fontWeight: "bold",
-		marginLeft: 10,
 		marginTop: 15,
 		marginBottom: 10,
 	},
@@ -397,4 +444,15 @@ const styles = StyleSheet.create({
 		alignSelf: "center",
 		borderRadius: 25,
 	},
+	rating: {
+    		flexDirection: 'row',
+    		justifyContent: 'space-evenly',
+    		alignItems: 'center',
+    		paddingHorizontal: 25,
+    		paddingVertical: 10,
+  	},
+	count: {
+    		fontSize: 10,
+		color: 'white',
+  	},
 });
