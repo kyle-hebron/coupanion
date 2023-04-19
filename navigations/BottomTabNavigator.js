@@ -2,7 +2,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import BusinessPage from "../screens/BusinessPage";
-import SearchScreen from "../screens/CouponMaker";
+import CouponMaker from "../screens/CouponMaker";
 import BusinessProfileScreen from "../screens/BusinessProfileScreen";
 
 import { getData } from "../components/UserDefaults";

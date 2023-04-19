@@ -15,7 +15,18 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
+import { db } from '../firebase'
+import { getAuth, updateProfile } from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+
 const CouponMaker = ({ navigation }) => {
+	const auth = getAuth();
+	const user = auth.currentUser;
+
+	const [titleText, setTitleText] = useState('');
+	const [codeText, setCodeText] = useState('');
+	const [discountText, setDiscountText] = useState('');
+
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
 	const showDatePicker = () => {
@@ -39,16 +50,17 @@ const CouponMaker = ({ navigation }) => {
 					<View style={styles.qrSection}>
 						<Ionicons name={"qr-code-outline"} size={150} color={"white"} />
 						<View style={styles.qrSectionInput}>
-							<TextInput placeholder="title" style={styles.input} />
-							<TextInput placeholder="code" style={styles.input} />
+							<TextInput placeholder="Title" style={styles.input} onChangeText={newText => setTitleText(newText)}/>
+							<TextInput placeholder="Code" style={styles.input} onChangeText={newText => setCodeText(newText)}/>
 						</View>
 					</View>
 					<View style={styles.bottom}>
 						<TextInput
 							keyboardType="numeric"
-							placeholder="discount"
+							placeholder="Discount"
 							style={[styles.discount, styles.input]}
 							maxLength={3}
+							onChangeText={newText => setDiscountText(newText)}
 						/>
 
 						<TouchableOpacity style={styles.date} onPress={showDatePicker}>
@@ -63,15 +75,44 @@ const CouponMaker = ({ navigation }) => {
 						<DateTimePickerModal
 							isVisible={isDatePickerVisible}
 							mode="date"
-							maximumDate={new Date(20301229)}
-							minimumDate={new Date(19500101)}
+							//maximumDate={new Date(20301229)}
+							//minimumDate={new Date(19500101)}
 							onConfirm={handleConfirm}
 							onCancel={hideDatePicker}
 							display="inline"
 						/>
 					</View>
 
-					<TouchableOpacity onPress={() => {}} style={styles.button}>
+					<TouchableOpacity onPress={async () => {
+						var currentCoupons;
+						var coupons = {Coupons: {}};
+
+						try {
+							const docSnap = await getDoc(doc(db, "Business people", user.uid));
+							console.log(docSnap.data());
+							currentCoupons = Object.keys(docSnap.data()['Coupons']);
+							console.log(currentCoupons);
+						} catch(error) {
+							console.log(error)
+						}
+
+						coupons['Coupons'][codeText] = {
+							title: titleText,
+							description: 'filler',
+							discount: discountText,
+						};
+						
+						if (user) {
+							setDoc(doc(db, "Business people", user.uid), coupons, { merge: true });
+
+							console.log('Coupon Created');
+
+
+						} else {
+							console.log("No Coupon Created");
+							setError("No Coupon Created");
+						}
+					}} style={styles.button}>
 						<Text styles={styles.buttonText}>Create</Text>
 					</TouchableOpacity>
 				</KeyboardAvoidingView>
