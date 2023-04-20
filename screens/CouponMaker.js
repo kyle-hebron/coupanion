@@ -9,6 +9,7 @@ import {
 	View,
 	TouchableWithoutFeedback,
 	Keyboard,
+	Alert
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -49,6 +50,16 @@ const CouponMaker = ({ navigation }) => {
 		return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
 	  }
 
+
+	const errorAlert = () =>
+    Alert.alert('Error', 'A coupon with this code already exists.', [
+      {
+        text: 'Ok',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+    ]);
+	
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<SafeAreaView style={styles.container}>
@@ -93,6 +104,7 @@ const CouponMaker = ({ navigation }) => {
 					<TouchableOpacity onPress={async () => {
 						var currentCoupons;
 						var coupons = {Coupons: {}};
+						var error = false;
 
 						try {
 							const docSnap = await getDoc(doc(db, "Business people", user.uid));
@@ -109,16 +121,25 @@ const CouponMaker = ({ navigation }) => {
 							discount: discountText,
 							expiration: expDate,
 						};
-						
-						if (user) {
-							setDoc(doc(db, "Business people", user.uid), coupons, { merge: true });
 
-							console.log('Coupon Created');
+						for (var i = 0; i < currentCoupons.length; i++) {
+							if (currentCoupons[i] == codeText) {
+								error = true;
+								errorAlert();
+								console.log('Error');
+							}
+						}
+						if (!error) {
+							if (user) {
+								setDoc(doc(db, "Business people", user.uid), coupons, { merge: true });
+
+								console.log('Coupon Created');
 
 
-						} else {
-							console.log("No Coupon Created");
-							setError("No Coupon Created");
+							} else {
+								console.log("No Coupon Created");
+								setError("No Coupon Created");
+							}
 						}
 					}} style={styles.button}>
 						<Text styles={styles.buttonText}>Create</Text>
