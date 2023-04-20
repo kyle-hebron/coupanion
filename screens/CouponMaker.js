@@ -20,12 +20,14 @@ import { getAuth, updateProfile } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const CouponMaker = ({ navigation }) => {
+
 	const auth = getAuth();
 	const user = auth.currentUser;
 
 	const [titleText, setTitleText] = useState('');
 	const [codeText, setCodeText] = useState('');
 	const [discountText, setDiscountText] = useState('');
+	const [expDate, setExpDate] = useState('Expiration');
 
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -38,9 +40,14 @@ const CouponMaker = ({ navigation }) => {
 	};
 
 	const handleConfirm = (date) => {
-		console.warn("A date has been picked: ", date);
+		console.warn("A date has been picked: ", removeTime(date));
+		setExpDate(removeTime(date));
 		hideDatePicker();
 	};
+
+	function removeTime(date) {
+		return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+	  }
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -70,7 +77,7 @@ const CouponMaker = ({ navigation }) => {
 								size={25}
 								color="lightgray"
 							/>
-							<Text styles={styles.dateText}>Expiration</Text>
+							<Text styles={styles.dateText}>{expDate}</Text>
 						</TouchableOpacity>
 						<DateTimePickerModal
 							isVisible={isDatePickerVisible}
@@ -100,6 +107,7 @@ const CouponMaker = ({ navigation }) => {
 							title: titleText,
 							description: 'filler',
 							discount: discountText,
+							expiration: expDate,
 						};
 						
 						if (user) {
