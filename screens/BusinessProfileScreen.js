@@ -17,10 +17,11 @@ import { useRoute } from "@react-navigation/native";
 import { Linking } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
+import locationiq from "react-native-locationiq";
 
-//import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
-//Yes, I know this is ugly -Kyle
+locationiq.init("LocationIQ_Access_Token"); // Paste the LocationIQ access token here when running .
+
 export default function BusinessProfileScreen({ navigation }) {
 	const [users, setUsers] = useState(" ");
 	const [address, setAddress] = useState(" ");
@@ -33,6 +34,7 @@ export default function BusinessProfileScreen({ navigation }) {
 	const [countUp, setCountUp] = useState(0); // For rating .
 	const [countDown, setCountDown] = useState(0); // For rating .
 	const [selected, setSelected] = useState(null); // For rating .
+	const [coordinates, setCoordinates] = useState(null); // For map .
 	const route = useRoute();
 	const id = route.params?.id;
 
@@ -60,6 +62,15 @@ export default function BusinessProfileScreen({ navigation }) {
 					setState(state);
 					setPfp(pfp);
 					//setPic(pic);
+					
+					// Call LocationIQ API to convert address to coordinates .
+					locationiq
+						.search(`${address}, ${city}, ${state} ${zip}`)
+						.then((response) => {
+							const { lat, lon } = response[0];
+							setCoordinates({ latitude: lat, longitude: lon });
+						})
+						.catch((error) => console.warn(error));
 				}
 			});
 		}
@@ -201,7 +212,9 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Find us</Text>
 				<View style={{ flex: 1, height: 250 }}>
-					<MapView style={styles.map} />
+					<MapView style={styles.map}>
+						{coordinates && <Marker coordinate={coordinates} />}
+					</MapView>
 				</View>
 
 				<View style={{ flexDirection: "row", marginTop: 50 }}>
