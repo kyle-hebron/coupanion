@@ -20,7 +20,7 @@ import { db } from "../firebase";
 import MapView, { Marker } from "react-native-maps";
 import locationiq from "react-native-locationiq";
 
-locationiq.init("LocationIQ_Access_Token"); // Paste the LocationIQ access token here when running .
+locationiq.init("LocationIQ_Acess_Token"); // Paste the LocationIQ access token here when running .
 
 export default function BusinessProfileScreen({ navigation }) {
 	const [users, setUsers] = useState(" ");

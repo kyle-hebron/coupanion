@@ -120,6 +120,7 @@ const CouponMaker = ({ navigation }) => {
 							description: 'filler',
 							discount: discountText,
 							expiration: expDate,
+							couponCode: codeText,
 						};
 
 						for (var i = 0; i < currentCoupons.length; i++) {

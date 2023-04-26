@@ -10,25 +10,94 @@ import {
 	View,
 	TouchableWithoutFeedback,
 	Keyboard,
+	FlatList,
+	
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import GradientIconButton from "../components/GradientIconButton";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
+import IconInput from "../components/IconInput";
 
 const SearchScreen = ({ navigation }) => {
+	const [input, setInput] = useState("");
+    const business = [];
+	const [searchList, setList] = useState([ ]);
+	async function search() {
+        const q = query(collection(db, "Business people"), where("business", "==", input));
+        const x = query(collection(db, "Business people"), where("tags", 'array-contains', input));
+        let i = 0;
+		
+        const querySnapshot = await getDocs(q);
+        const qSnap = await getDocs(x);
+        
+        
+        querySnapshot.forEach((doc) => {
+            business[i] = doc.data();
+            i++;
+        })
+        
+    
+        qSnap.forEach((doc) => {
+            business[i] = doc.data();
+            i++;
+        });
+		setList(business);
+		
+    } 
+
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<SafeAreaView style={styles.container}>
 				<KeyboardAvoidingView>
 					<Text style={styles.title}>Search</Text>
 					<View style={styles.searchSection}>
-						<TextInput
-							placeholder="Search for 'Chinese food'"
-							style={styles.input}
-						/>
-						<TouchableOpacity>
+						
+						<IconInput text="Code"
+							handleChange={setInput}
+							/>
+						<TouchableOpacity onPress={() => search()}>
 							<Icon style={styles.icon} name="search" size={30} color="#FFF" />
 						</TouchableOpacity>
+						            <FlatList
+            data={business.sort((a, b) => a.name.localeCompare(b.name))}
+            renderItem = {({item}) => {
+                if(input === ""){
+                    return(
+                    <View style={styles.item}>
+                    <Image source={item.image} style={styles.logo} />
+                <View style={styles.nameContainer}>
+                    <Text style={styles.text}>{item.name}</Text>
+                    <Text style={styles.tag}>{item.tag}</Text>
+                    <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
+                    </View>
+                <View style={styles.ratingContainer}>
+                <Image source={item.thumb} style={styles.thumb}/>
+                <Text style={{fontSize: 14, fontWeight: 'Bold'}}>{item.rating}</Text>
+                </View>
+                </View>
+                )
+            }
+
+            if(item.name.toLowerCase().includes(input.toLowerCase())){
+                return(
+                <View style={styles.item}>
+                <Image source={item.image} style={styles.logo} />
+            <View style={styles.nameContainer}>
+                <Text style={styles.text}>{item.name}</Text>
+                <Text style={styles.tag}>{item.tag}</Text>
+                <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
+                </View>
+            <View style={styles.ratingContainer}>
+            <Image source={item.thumb} style={styles.thumb}/>
+            <Text style={{fontSize: 14, fontWeight: 'Bold'}}>{item.rating}</Text>
+            </View>
+            </View>
+                )
+            }
+
+            }}/>
 					</View>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
