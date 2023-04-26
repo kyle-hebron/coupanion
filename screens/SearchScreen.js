@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	StyleSheet,
 	Text,
@@ -21,32 +21,71 @@ import { db } from "../firebase";
 import IconInput from "../components/IconInput";
 
 const SearchScreen = ({ navigation }) => {
+	const [size, setSize] = useState(0);
 	const [input, setInput] = useState("");
     const business = [];
+	var listBusiness = []; 
 	const [searchList, setList] = useState([ ]);
+	const [bus, setBus] = useState([]);
+	const [hasSearched, setSearch] = useState(false);
+	var temp = 0;
+	useEffect(() => {
 	async function search() {
-        const q = query(collection(db, "Business people"), where("business", "==", input));
-        const x = query(collection(db, "Business people"), where("tags", 'array-contains', input));
-        let i = 0;
+        const q = query(collection(db, "Business people"));
+        
+        
 		
         const querySnapshot = await getDocs(q);
-        const qSnap = await getDocs(x);
         
         
-        querySnapshot.forEach((doc) => {
+        let i = 0;
+        querySnapshot.forEach((doc) => {	//Need if statement to only get within a certain radius
             business[i] = doc.data();
             i++;
-        })
+			setSize(i);
+			setList(business);
+        });
         
     
-        qSnap.forEach((doc) => {
-            business[i] = doc.data();
-            i++;
-        });
-		setList(business);
+        
 		
-    } 
-
+		console.log(searchList[16].business);
+		
+    } search();
+}, []);
+	function searchData(){
+		setSearch(false);
+		var tempBus = [];
+		for(let i = 0; i < size; i++){
+			if(searchList[i].business == input && searchList[i].uid != undefined){
+				tempBus.push({ id: temp++,
+					"name": searchList[i].business,
+					"userID": searchList[i].uid
+					
+				})
+			}
+		}
+		listBusiness = tempBus;
+		temp = 0;
+		console.log(listBusiness);
+		setSearch(true);
+	};
+	
+	const renderItem = ({ item, index }) => (
+		
+		<TouchableOpacity
+			onPress={() => navigation.navigate("Business", { id: item.id })}
+		>
+			<View style={styles.item}>
+				<Image source={item.image} style={styles.logo} />
+				<View style={styles.nameContainer}>
+					<Text style={styles.text}>{item.name}</Text>
+					
+				</View>
+			</View>
+		</TouchableOpacity>
+	);
+	
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<SafeAreaView style={styles.container}>
@@ -57,47 +96,14 @@ const SearchScreen = ({ navigation }) => {
 						<IconInput text="Code"
 							handleChange={setInput}
 							/>
-						<TouchableOpacity onPress={() => search()}>
+						<TouchableOpacity onPress={() => searchData()}>
 							<Icon style={styles.icon} name="search" size={30} color="#FFF" />
 						</TouchableOpacity>
-						            <FlatList
-            data={business.sort((a, b) => a.name.localeCompare(b.name))}
-            renderItem = {({item}) => {
-                if(input === ""){
-                    return(
-                    <View style={styles.item}>
-                    <Image source={item.image} style={styles.logo} />
-                <View style={styles.nameContainer}>
-                    <Text style={styles.text}>{item.name}</Text>
-                    <Text style={styles.tag}>{item.tag}</Text>
-                    <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
-                    </View>
-                <View style={styles.ratingContainer}>
-                <Image source={item.thumb} style={styles.thumb}/>
-                <Text style={{fontSize: 14, fontWeight: 'Bold'}}>{item.rating}</Text>
-                </View>
-                </View>
-                )
-            }
-
-            if(item.name.toLowerCase().includes(input.toLowerCase())){
-                return(
-                <View style={styles.item}>
-                <Image source={item.image} style={styles.logo} />
-            <View style={styles.nameContainer}>
-                <Text style={styles.text}>{item.name}</Text>
-                <Text style={styles.tag}>{item.tag}</Text>
-                <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
-                </View>
-            <View style={styles.ratingContainer}>
-            <Image source={item.thumb} style={styles.thumb}/>
-            <Text style={{fontSize: 14, fontWeight: 'Bold'}}>{item.rating}</Text>
-            </View>
-            </View>
-                )
-            }
-
-            }}/>
+						<Text>Hello</Text>
+						           
+					</View>
+					<View>
+						{hasSearched ? <Text>{listBusiness[0].name}</Text>: <></>}
 					</View>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
