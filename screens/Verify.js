@@ -15,6 +15,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 export default function Verify({navigation}) {
     const auth = getAuth();
 	const user = auth.currentUser;
+    const userID = user.uid;
     const [codes, setCode] = useState(" ");
     
     const [coupons, setCoupons] = useState([ ]);
@@ -26,10 +27,9 @@ export default function Verify({navigation}) {
         const querySnapshot = await getDocs(q);
         const users = [];
         querySnapshot.forEach((doc) => {
-            if(doc.id == "1irCBj1ZRwTVrW5M8uRsB3pX6w63"){
+            if(doc.id == userID)
                 setCoupons(doc.data()['Coupons']);
-                exit;
-            }
+             
             
         });
     } fetchData(); }, []);
@@ -66,7 +66,7 @@ export default function Verify({navigation}) {
                 >  </GradientTextButton>
                 </TouchableOpacity>
                 <TouchableOpacity
-            onPress = {() => navigation.navigate("CouponMake")}>
+            onPress = {() => navigation.navigate("CouponMaker")}>
                 
             <GradientTextButton
                 text="Coupon Maker"
