@@ -144,7 +144,7 @@ const CouponMaker = ({ navigation }) => {
 							if (user) {
 								setDoc(doc(db, "Business people", user.uid), coupons, { merge: true });
 
-								console.log('Coupon Created');
+								alert('Coupon Created');
 
 
 							} else {
@@ -154,6 +154,9 @@ const CouponMaker = ({ navigation }) => {
 						}
 					}} style={styles.button}>
 						<Text styles={styles.buttonText}>Create</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => navigation.navigate("Verify")} style={styles.button} >
+					<Text styles={styles.buttonText}>Back</Text>
 					</TouchableOpacity>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
@@ -231,5 +234,15 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 25,
 		marginLeft: 10,
 	},
+	buttonGroup: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        shadowOffset: { width: 1, height: 5 },
+        marginBottom: 20,
+        backgroundColor: "white"
+    },
 	discount: {},
 });
