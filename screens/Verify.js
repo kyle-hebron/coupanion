@@ -22,13 +22,14 @@ export default function Verify({navigation}) {
     
     useEffect(() => {
     async function fetchData() {
-        const q = query(collection(db, "Business people", user.uid));
+        const q = query(collection(db, "Business people"));
         const querySnapshot = await getDocs(q);
         const users = [];
         querySnapshot.forEach((doc) => {
-            
+            if(doc.id == "1irCBj1ZRwTVrW5M8uRsB3pX6w63"){
                 setCoupons(doc.data()['Coupons']);
-               
+                exit;
+            }
             
         });
     } fetchData(); }, []);
@@ -36,7 +37,7 @@ export default function Verify({navigation}) {
         
         if(coupons[codes] != undefined){
 
-            temp = coupons[codes].description;
+            var temp = coupons[codes].description;
             Alert.alert("Success!",temp);
 
         }
@@ -64,7 +65,14 @@ export default function Verify({navigation}) {
                 style={styles.buttonGroup}
                 >  </GradientTextButton>
                 </TouchableOpacity>
-            
+                <TouchableOpacity
+            onPress = {() => navigation.navigate("CouponMake")}>
+                
+            <GradientTextButton
+                text="Coupon Maker"
+                style={styles.buttonGroup}
+                >  </GradientTextButton>
+                </TouchableOpacity>
             
 
         </SafeAreaView>
