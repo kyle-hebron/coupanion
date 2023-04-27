@@ -69,7 +69,7 @@ function LoginScreen({ navigation }) {
 				secure={true}
 			/>
 
-			<TouchableOpacity onPress={() => navigation.navigate("SearchScreen")}>
+			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
 				<Text style={{ color: "#949494" }}>Forgot password?</Text>
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => signInUser(username, password)}>

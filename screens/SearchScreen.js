@@ -21,9 +21,8 @@ import { db } from "../firebase";
 import IconInput from "../components/IconInput";
 
 const SearchScreen = ({ navigation }) => {
-  const [size, setSize] = useState(0);
   const [input, setInput] = useState("");
-  const [business, setBusiness] = useState([]);
+  const [businesses, setBusinesses] = useState([]);
   const [searchList, setSearchList] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -32,10 +31,9 @@ const SearchScreen = ({ navigation }) => {
       try {
         const q = query(collection(db, "Business people"));
         const querySnapshot = await getDocs(q);
-        const businesses = querySnapshot.docs.map((doc) => doc.data());
-        setBusiness(businesses);
-        setSearchList(businesses);
-        setSize(businesses.length);
+        const businessesData = querySnapshot.docs.map((doc) => doc.data());
+        setBusinesses(businessesData);
+        setSearchList(businessesData);
       } catch (error) {
         console.log("Error fetching data: ", error);
       }
@@ -45,34 +43,33 @@ const SearchScreen = ({ navigation }) => {
   }, []);
 
   const searchData = () => {
-	setHasSearched(false);
-	if (input.trim() === "") {
-	  setSearchList([]);
-	  setHasSearched(true);
-	  return;
-	}
-	const searchTerm = input.toLowerCase();
-	const tempBus = business.filter(
-	  (item) =>
-		item.business &&
-		item.business.toLowerCase().includes(searchTerm) &&
-		item.uid !== undefined
-	);
-	setSearchList(tempBus);
-	setHasSearched(true);
+    setHasSearched(false);
+    if (input.trim() === "") {
+      setSearchList([]);
+      setHasSearched(true);
+      return;
+    }
+    const searchTerm = input.toLowerCase();
+    const filteredBusinesses = businesses.filter(
+      (item) =>
+        item.business &&
+        item.business.toLowerCase().includes(searchTerm) &&
+        item.uid !== undefined
+    );
+    setSearchList(filteredBusinesses);
+    setHasSearched(true);
   };
 
-
   const renderItem = ({ item }) => (
-	<TouchableOpacity
-	  onPress={() => navigateToBusiness(item)}
-	  style={styles.button}
-	>
-	  <View style={styles.buttonContainer}>
-		{/* Add image component here if available */}
-		<Text style={styles.buttonText}>{item.business}</Text>
-	  </View>
-	</TouchableOpacity>
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Business", { id: item.uid })}
+      style={styles.button}
+    >
+      <View style={styles.buttonContainer}>
+        {/* Add image component here if available */}
+        <Text style={styles.buttonText}>{item.business}</Text>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -89,15 +86,13 @@ const SearchScreen = ({ navigation }) => {
               <Icon style={styles.icon} name="search" size={30} color="#FFF" />
             </TouchableOpacity>
           </View>
-          <View>
-		  {hasSearched && (
-    <FlatList
-      data={searchList}
-      renderItem={renderItem}
-      keyExtractor={(item, index) => index.toString()} // Generate unique key using the index
-    />
-  )}
-          </View>
+          {hasSearched && (
+            <FlatList
+              data={searchList}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          )}
         </KeyboardAvoidingView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -107,16 +102,50 @@ const SearchScreen = ({ navigation }) => {
 export default SearchScreen;
 
 const styles = StyleSheet.create({
-	// ...
-  
+	container: {
+	  backgroundColor: "#102C54",
+	  flex: 1,
+	},
+	input: {
+	  backgroundColor: "white",
+	  paddingHorizontal: 25,
+	  paddingVertical: 0,
+	  borderRadius: 100,
+	  width: "90%",
+	  paddingVertical: 15,
+	  fontSize: 18, // Increase the font size
+	},
+	searchSection: {
+	  flexDirection: "row",
+	  width: "90%",
+	  marginTop: 10, // Increase the top margin
+	  marginLeft: 15,
+	  justifyContent: "space-between",
+	  alignItems: "center",
+	},
+	title: {
+	  color: "white",
+	  fontWeight: "bold",
+	  fontSize: 36,
+	  marginLeft: 15,
+	  marginTop: 30,
+	  borderRadius: 100,
+	},
+	icon: {
+	  flexDirection: "row",
+	  justifyContent: "space-between",
+	  alignItems: "center",
+	  borderRadius: 50,
+	  height: 30,
+	  paddingHorizontal: 10,
+	},
 	button: {
 	  backgroundColor: "#FFF",
 	  borderRadius: 30,
-	  paddingVertical: 10,
+	  paddingVertical: 15, // Increase the padding vertically
 	  paddingHorizontal: 20,
-	  marginBottom: 10,
-	  marginLeft: 15,
-	  marginRight: 15,
+	  marginBottom: 15, // Increase the bottom margin
+	  marginHorizontal: 15,
 	  alignSelf: "stretch",
 	},
 	buttonContainer: {
@@ -126,43 +155,8 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 	  color: "#102C54",
-	  fontSize: 18,
+	  fontSize: 20, // Increase the font size
+	  fontWeight: "bold", // Add font weight
 	},
-  container: {
-    backgroundColor: "#102C54",
-    flex: 1,
-  },
-  input: {
-    backgroundColor: "white",
-    paddingHorizontal
-: 25,
-		paddingVertical: 0,
-		borderRadius: 100,
-		width: "90%",
-		paddingVertical: 15,
-	},
-	searchSection: {
-		flexDirection: "row",
-		width: "90%",
-		marginTop: 5,
-		marginLeft: 15,
-		justifyContent: "space-between",
-		alignItems: "center",
-	},
-	title: {
-		color: "white",
-		fontWeight: "bold",
-		fontSize: 36,
-		marginLeft: 15,
-		marginTop: 30,
-		borderRadius: 100,
-	},
-	icon: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		borderRadius: 50,
-		height: 30,
-		paddingHorizontal: 10,
-	},
-});
+  });
+  
