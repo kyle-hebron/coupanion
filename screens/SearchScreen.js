@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	StyleSheet,
 	Text,
@@ -19,34 +19,81 @@ import GradientIconButton from "../components/GradientIconButton";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import IconInput from "../components/IconInput";
+import GradientTextButton from "../components/GradientTextButton";
+//import { text } from "stream/consumers";
 
 const SearchScreen = ({ navigation }) => {
+	const [size, setSize] = useState(0);
 	const [input, setInput] = useState("");
-    const business = [];
-	const [searchList, setList] = useState([ ]);
-	async function search() {
-        const q = query(collection(db, "Business people"), where("business", "==", input));
-        const x = query(collection(db, "Business people"), where("tags", 'array-contains', input));
-        let i = 0;
-		
-        const querySnapshot = await getDocs(q);
-        const qSnap = await getDocs(x);
-        
-        
-        querySnapshot.forEach((doc) => {
-            business[i] = doc.data();
-            i++;
-        })
-        
-    
-        qSnap.forEach((doc) => {
-            business[i] = doc.data();
-            i++;
-        });
-		setList(business);
-		
-    } 
+    var business = [];
+	var listBusiness = []; 
+	const [searchList, setList] = useState([]);
+	const [bus, setBus] = useState([]);
+	const [businesses, setBusinesses] = useState([]);
+	const [hasSearched, setSearch] = useState(false);
+	var temp = 0;
+	var keyCount = 0;
+	useEffect(() => {}, []);
 
+	async function search() {
+        const q = query(collection(db, "Business people"));
+        
+        const querySnapshot = await getDocs(q);
+        
+        let i = 0;
+        querySnapshot.forEach((doc) => {	//Need if statement to only get within a certain radius
+            business[i] = [doc.data(), doc.id];
+            i++;
+			setSize(i);
+			setList(business);
+        });
+		
+    }
+
+	async function searchData() {
+		var allBusinesses = [];
+
+		await search();
+
+		for (let i = 0; i < size; i++) {
+			if (business[i][0]['business'] != undefined) {
+				allBusinesses.push([business[i][0]['business'], business[i][1]]);
+			}
+		}
+
+		//setBusinesses(businessItem(allBusinesses));
+
+		setBusinesses(businessItem(searchBusinesses(allBusinesses, input.toLowerCase())));
+	};
+
+	function businessItem(businessesInfo) {
+		var listBusiness = [];
+		var current;
+
+		for (var i = 0; i < businessesInfo.length; i++) {
+			current = businessesInfo[i][1];
+			listBusiness.push(
+					<TouchableOpacity key={keyCount} onPress={() => navigation.navigate("Business", { id: current })}>
+						<GradientTextButton text={businessesInfo[i][0]} />
+					</TouchableOpacity>
+				);
+			keyCount++;
+		}
+
+		return listBusiness;
+	}
+
+	function searchBusinesses(allBusinesses, searchText) {
+		var trueBusinesses = [];
+		for(let i = 0; i < allBusinesses.length; i++) {
+			if ((allBusinesses[i][0].toLowerCase()).includes(searchText)) {
+				trueBusinesses.push([allBusinesses[i][0], allBusinesses[i][1]]);
+			}
+		}
+		
+		return trueBusinesses;
+	}
+	
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<SafeAreaView style={styles.container}>
@@ -54,50 +101,15 @@ const SearchScreen = ({ navigation }) => {
 					<Text style={styles.title}>Search</Text>
 					<View style={styles.searchSection}>
 						
-						<IconInput text="Code"
+						<IconInput text="Search"
 							handleChange={setInput}
 							/>
-						<TouchableOpacity onPress={() => search()}>
+						<TouchableOpacity onPress={() => searchData()}>
 							<Icon style={styles.icon} name="search" size={30} color="#FFF" />
 						</TouchableOpacity>
-						            <FlatList
-            data={business.sort((a, b) => a.name.localeCompare(b.name))}
-            renderItem = {({item}) => {
-                if(input === ""){
-                    return(
-                    <View style={styles.item}>
-                    <Image source={item.image} style={styles.logo} />
-                <View style={styles.nameContainer}>
-                    <Text style={styles.text}>{item.name}</Text>
-                    <Text style={styles.tag}>{item.tag}</Text>
-                    <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
-                    </View>
-                <View style={styles.ratingContainer}>
-                <Image source={item.thumb} style={styles.thumb}/>
-                <Text style={{fontSize: 14, fontWeight: 'Bold'}}>{item.rating}</Text>
-                </View>
-                </View>
-                )
-            }
-
-            if(item.name.toLowerCase().includes(input.toLowerCase())){
-                return(
-                <View style={styles.item}>
-                <Image source={item.image} style={styles.logo} />
-            <View style={styles.nameContainer}>
-                <Text style={styles.text}>{item.name}</Text>
-                <Text style={styles.tag}>{item.tag}</Text>
-                <Text style={{fontSize: 14, color:'#969696', fontWeight: 'bold'}}>{item.miles}</Text>
-                </View>
-            <View style={styles.ratingContainer}>
-            <Image source={item.thumb} style={styles.thumb}/>
-            <Text style={{fontSize: 14, fontWeight: 'Bold'}}>{item.rating}</Text>
-            </View>
-            </View>
-                )
-            }
-
-            }}/>
+					</View>
+					<View>
+						{businesses}
 					</View>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
