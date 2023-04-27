@@ -52,6 +52,8 @@ export default function BusinessProfileScreen({ navigation }) {
 					const zip = doc.data().AddressInfo.zip;
 					const state = doc.data().AddressInfo.state;
 					const pfp = doc.data().pfp;
+					const countUp = doc.data().thumbUp;
+					const countDown = doc.data().thumbDown;
 					//const pic = doc.data().pic;
 
 					setUsers(business);
@@ -61,6 +63,8 @@ export default function BusinessProfileScreen({ navigation }) {
 					setZip(zip);
 					setState(state);
 					setPfp(pfp);
+					setCountUp(countUp)
+					setCountDown(countDown)
 					//setPic(pic);
 					
 					// Call LocationIQ API to convert address to coordinates .
@@ -79,29 +83,36 @@ export default function BusinessProfileScreen({ navigation }) {
 	
 	// A function to handle upvotes and downvotes , and to update the count of each accordingly .
 	const handleVote = (type) => {
+
   		if (type === selected) {
     			setSelected(null);
     			if (type === "up") {
       				setCountUp(countUp - 1);
+					  db.collection("Business people").doc(id).update({"thumbUp": increment(-1)})
     			} else {
       				setCountDown(countDown - 1);
+					  db.collection("Business people").doc(id).update({"thumbDown": increment(-1)})
     			}
   		} else {
     			setSelected(type);
     			if (type === "up") {
       				setCountUp(countUp + 1);
+					db.collection("Business people").doc(id).update({"thumbUp": increment(1)})
       				if (selected === "down") {
         				setCountDown(countDown - 1);
+						db.collection("Business people").doc(id).update({"thumbDown": increment(-1)})
       				}
     			} else {
       				setCountDown(countDown + 1);
+					db.collection("Business people").doc(id).update({"thumbDown": increment(1)})
       				if (selected === "up") {
         				setCountUp(countUp - 1);
+						db.collection("Business people").doc(id).update({"thumbUp": increment(-1)})
       				}
     			}
   		}
 	};
-
+	
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView>
