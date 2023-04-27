@@ -15,6 +15,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 export default function Verify({navigation}) {
     const auth = getAuth();
 	const user = auth.currentUser;
+    const userID = user.uid;
     const [codes, setCode] = useState(" ");
     
     const [coupons, setCoupons] = useState([ ]);
@@ -22,13 +23,13 @@ export default function Verify({navigation}) {
     
     useEffect(() => {
     async function fetchData() {
-        const q = query(collection(db, "Business people", user.uid));
+        const q = query(collection(db, "Business people"));
         const querySnapshot = await getDocs(q);
         const users = [];
         querySnapshot.forEach((doc) => {
-            
+            if(doc.id == userID)
                 setCoupons(doc.data()['Coupons']);
-               
+             
             
         });
     } fetchData(); }, []);
@@ -36,7 +37,7 @@ export default function Verify({navigation}) {
         
         if(coupons[codes] != undefined){
 
-            temp = coupons[codes].description;
+            var temp = coupons[codes].description;
             Alert.alert("Success!",temp);
 
         }
@@ -64,7 +65,14 @@ export default function Verify({navigation}) {
                 style={styles.buttonGroup}
                 >  </GradientTextButton>
                 </TouchableOpacity>
-            
+                <TouchableOpacity
+            onPress = {() => navigation.navigate("CouponMaker")}>
+                
+            <GradientTextButton
+                text="Coupon Maker"
+                style={styles.buttonGroup}
+                >  </GradientTextButton>
+                </TouchableOpacity>
             
 
         </SafeAreaView>

@@ -9,6 +9,7 @@ import ListScreen from "../screens/ListScreen";
 import BusinessProfileScreen from "../screens/BusinessProfileScreen";
 import Verify from "../screens/Verify"
 import SearchScreen from "../screens/SearchScreen";
+import CouponMaker from "../screens/CouponMaker";
 
 import BottomTabNavigator from "./BottomTabNavigator";
 import BottomTabNavigatorUser from "./BottomTabNavigatorUser";
@@ -34,6 +35,7 @@ function AuthNavigator() {
 			<Stack.Screen name="Verify" component={Verify} />
 			<Stack.Screen name="ListScreen" component={ListScreen} />
 			<Stack.Screen name="SearchScreen" component={SearchScreen} />
+			<Stack.Screen name="CouponMaker" component={CouponMaker} />
 			<Stack.Screen
 				name="SignedIn"
 				component={

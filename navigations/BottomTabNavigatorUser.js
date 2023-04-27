@@ -31,7 +31,7 @@ function BottomTabNavigatorUser() {
 				tabBarActiveTintColor: "black",
 				tabBarInactiveTintColor: "gray",
 			})}
-			initialRouteName="Verify"
+			initialRouteName="Home"
 		>
 			<Tab.Screen name="Home" component={HomeScreen} />
 			<Tab.Screen name="Search" component={SearchScreen} />

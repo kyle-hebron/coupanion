@@ -174,7 +174,7 @@ export default function BusinessProfileScreen({ navigation }) {
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
 					onPress={() => {
-						alert("No other coupons available");
+						navigation.navigate("Verify");
 					}}
 				>
 					<Text style={{ fontSize: 15, color: "white", paddingHorizontal: 25 }}>
