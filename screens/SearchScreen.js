@@ -33,7 +33,6 @@ const SearchScreen = ({ navigation }) => {
 	const [hasSearched, setSearch] = useState(false);
 	var temp = 0;
 	var keyCount = 0;
-	useEffect(() => {}, []);
 
 	async function search() {
         const q = query(collection(db, "Business people"));
@@ -47,8 +46,11 @@ const SearchScreen = ({ navigation }) => {
 			setSize(i);
 			setList(business);
         });
-		
     }
+
+	useEffect(() => {
+  		search()
+	}, [])
 
 	async function searchData() {
 		var allBusinesses = [];
@@ -62,8 +64,12 @@ const SearchScreen = ({ navigation }) => {
 		}
 
 		//setBusinesses(businessItem(allBusinesses));
+		var temp1 = searchBusinesses(allBusinesses, input.toLowerCase());
+		var temp2 = businessItem(temp1);
 
-		setBusinesses(businessItem(searchBusinesses(allBusinesses, input.toLowerCase())));
+
+		setBusinesses(temp2);
+		console.log('BOOOOOOP' + businesses);
 	};
 
 	function businessItem(businessesInfo) {
