@@ -1,23 +1,23 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { StyleSheet, Text, View } from "react-native";
-import { getData } from "./components/UserDefaults";
+import { NavigationContainer } from "@react-navigation/native"
+import { StyleSheet, Text, View } from "react-native"
+import { getData } from "./components/UserDefaults"
 
-import AuthNavigator from "./navigations/AuthNavigator";
-import BottomTabNavigator from "./navigations/BottomTabNavigator";
+import AuthNavigator from "./navigations/AuthNavigator"
+import BottomTabNavigator from "./navigations/BottomTabNavigator"
 
-import { auth } from "./firebase";
-import BottomTabNavigatorUser from "./navigations/BottomTabNavigatorUser";
+import { auth } from "./firebase"
+import BottomTabNavigatorUser from "./navigations/BottomTabNavigatorUser"
 
 export default function App() {
 	//Checks if there is a user signed in or not
 
 	const isBusiness = () => {
 		if (getData("@isBusiness") == "true") {
-			return true;
+			return true
 		} else {
-			return false;
+			return false
 		}
-	};
+	}
 
 	return (
 		//Checking for
@@ -32,7 +32,7 @@ export default function App() {
 				<AuthNavigator />
 			)}
 		</NavigationContainer>
-	);
+	)
 }
 
 const styles = StyleSheet.create({
@@ -46,4 +46,4 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "100%",
 	},
-});
+})

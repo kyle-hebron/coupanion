@@ -2,11 +2,11 @@ import {
 	onAuthStateChanged,
 	signInWithEmailAndPassword,
 	getAuth,
-} from "firebase/auth";
-import { doc, DocumentSnapshot, getDoc } from "firebase/firestore";
-import React, { Component, useState, useEffect } from "react";
+} from "firebase/auth"
+import { doc, DocumentSnapshot, getDoc } from "firebase/firestore"
+import React, { Component, useState, useEffect } from "react"
 
-import { storeData } from "../components/UserDefaults";
+import { storeData } from "../components/UserDefaults"
 
 import {
 	StyleSheet,
@@ -17,44 +17,47 @@ import {
 	TextInput,
 	KeyboardAvoidingView,
 	TouchableOpacity,
-} from "react-native";
+} from "react-native"
 
-import GradientTextButton from "../components/GradientTextButton";
-import IconInput from "../components/IconInput";
-import { auth, db } from "../firebase";
-import { isBusiness } from "../Helpers/dbHelper";
+import GradientTextButton from "../components/GradientTextButton"
+import IconInput from "../components/IconInput"
+import { auth, db } from "../firebase"
+import { isBusiness } from "../Helpers/dbHelper"
 
 function LoginScreen({ navigation }) {
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-	const [user, setUser] = useState();
-	const [userData, setUserdata] = useState({});
-	const [error, setError] = useState("");
+	const [username, setUsername] = useState("")
+	const [password, setPassword] = useState("")
+	const [user, setUser] = useState()
+	const [userData, setUserdata] = useState({})
+	const [error, setError] = useState("")
 
-	const auth = getAuth();
+	const auth = getAuth()
 
 	function signInUser(username, password) {
 		signInWithEmailAndPassword(auth, username, password)
 			.then((userCredential) => {
 				// Signed in
-				const user = userCredential.user;
-				console.log("here");
+				const user = userCredential.user
+				console.log("here")
 				if (isBusiness(auth.currentUser.uid)) {
-					storeData("@isBusiness", "true");
+					storeData("@isBusiness", "true")
 				} else {
-					storeData("@isBusiness", "false");
+					storeData("@isBusiness", "false")
 				}
-				navigation.navigate("SignedIn");
+				navigation.navigate("SignedIn")
 			})
 			.catch((error) => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
-			});
+				const errorCode = error.code
+				const errorMessage = error.message
+			})
 	}
 
 	return (
 		<KeyboardAvoidingView style={styles.container}>
-			<Image style={styles.logo} source={require("../assets/Logo.png")} />
+			<Image
+				style={styles.logo}
+				source={require("../assets/Logo.png")}
+			/>
 
 			<IconInput
 				icon="user-circle"
@@ -69,20 +72,27 @@ function LoginScreen({ navigation }) {
 				secure={true}
 			/>
 
-			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
+			<TouchableOpacity
+				onPress={() => navigation.navigate("RegisterChoice")}
+			>
 				<Text style={{ color: "#949494" }}>Forgot password?</Text>
 			</TouchableOpacity>
 			<TouchableOpacity onPress={() => signInUser(username, password)}>
-				<GradientTextButton text="Sign In" styles={styles} />
+				<GradientTextButton
+					text="Sign In"
+					styles={styles}
+				/>
 			</TouchableOpacity>
-			<TouchableOpacity onPress={() => navigation.navigate("RegisterChoice")}>
+			<TouchableOpacity
+				onPress={() => navigation.navigate("RegisterChoice")}
+			>
 				<Text style={{ color: "#949494" }}>
 					Don't have an account?{" "}
 					<Text style={{ fontWeight: "bold" }}>Sign Up</Text>
 				</Text>
 			</TouchableOpacity>
 		</KeyboardAvoidingView>
-	);
+	)
 }
 
 const styles = StyleSheet.create({
@@ -121,6 +131,6 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 1, height: 5 },
 		marginBottom: 20,
 	},
-});
+})
 
-export default LoginScreen;
+export default LoginScreen
