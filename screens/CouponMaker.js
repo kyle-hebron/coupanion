@@ -28,6 +28,7 @@ const CouponMaker = ({ navigation }) => {
 	const [titleText, setTitleText] = useState('');
 	const [codeText, setCodeText] = useState('');
 	const [discountText, setDiscountText] = useState('');
+	const [descriptionText, setDescription] = useState('');
 	const [expDate, setExpDate] = useState('Expiration');
 
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -99,6 +100,15 @@ const CouponMaker = ({ navigation }) => {
 							onCancel={hideDatePicker}
 							display="inline"
 						/>
+						
+					</View>
+					<View style={styles.bottom}>
+					<TextInput
+							placeholder="Description"
+							style={[styles.discount, styles.inputs]}
+							
+							onChangeText={newText => setDescription(newText)}
+						/>
 					</View>
 
 					<TouchableOpacity onPress={async () => {
@@ -117,9 +127,10 @@ const CouponMaker = ({ navigation }) => {
 
 						coupons['Coupons'][codeText] = {
 							title: titleText,
-							description: 'filler',
+							description: descriptionText,
 							discount: discountText,
 							expiration: expDate,
+							couponCode: codeText,
 						};
 
 						for (var i = 0; i < currentCoupons.length; i++) {
@@ -133,7 +144,7 @@ const CouponMaker = ({ navigation }) => {
 							if (user) {
 								setDoc(doc(db, "Business people", user.uid), coupons, { merge: true });
 
-								console.log('Coupon Created');
+								alert('Coupon Created');
 
 
 							} else {
@@ -143,6 +154,9 @@ const CouponMaker = ({ navigation }) => {
 						}
 					}} style={styles.button}>
 						<Text styles={styles.buttonText}>Create</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => navigation.navigate("Verify")} style={styles.button} >
+					<Text styles={styles.buttonText}>Back</Text>
 					</TouchableOpacity>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
@@ -198,6 +212,14 @@ const styles = StyleSheet.create({
 		padding: 25,
 		marginHorizontal: 10,
 	},
+	inputs: {
+		backgroundColor: "white",
+		paddingHorizontal: 145,
+		paddingVertical: 15,
+		borderRadius: 100,
+		marginTop: 20,
+		textAlign: "center",
+	},
 
 	calendar: { marginRight: 15 },
 
@@ -212,5 +234,15 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 25,
 		marginLeft: 10,
 	},
+	buttonGroup: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        shadowOffset: { width: 1, height: 5 },
+        marginBottom: 20,
+        backgroundColor: "white"
+    },
 	discount: {},
 });

@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import BusinessPage from "../screens/BusinessPage";
 import CouponMaker from "../screens/CouponMaker";
 import BusinessProfileScreen from "../screens/BusinessProfileScreen";
+import Verify from "../screens/Verify";
 
 import { getData } from "../components/UserDefaults";
 
@@ -34,6 +35,7 @@ function BottomTabNavigator() {
 		>
 			<Tab.Screen name="CouponMaker" component={CouponMaker} />
 			<Tab.Screen name="Profile" component={BusinessProfileScreen} />
+			<Tab.Screen name="Verify" component={Verify} />
 		</Tab.Navigator>
 	);
 }

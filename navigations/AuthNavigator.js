@@ -7,6 +7,9 @@ import BusinessRegister from "../screens/BusinessRegister";
 import Question from "../screens/Question";
 import ListScreen from "../screens/ListScreen";
 import BusinessProfileScreen from "../screens/BusinessProfileScreen";
+import Verify from "../screens/Verify"
+import SearchScreen from "../screens/SearchScreen";
+import CouponMaker from "../screens/CouponMaker";
 
 import BottomTabNavigator from "./BottomTabNavigator";
 import BottomTabNavigatorUser from "./BottomTabNavigatorUser";
@@ -29,7 +32,10 @@ function AuthNavigator() {
 			<Stack.Screen name="BusinessRegister" component={BusinessRegister} />
 			<Stack.Screen name="Business" component={BusinessProfileScreen} />
 			<Stack.Screen name="Question" component={Question} />
+			<Stack.Screen name="Verify" component={Verify} />
 			<Stack.Screen name="ListScreen" component={ListScreen} />
+			<Stack.Screen name="SearchScreen" component={SearchScreen} />
+			<Stack.Screen name="CouponMaker" component={CouponMaker} />
 			<Stack.Screen
 				name="SignedIn"
 				component={
