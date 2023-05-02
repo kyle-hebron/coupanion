@@ -6,7 +6,7 @@ import {
 import { doc, DocumentSnapshot, getDoc } from "firebase/firestore"
 import React, { Component, useState, useEffect } from "react"
 
-import { storeData } from "../components/UserDefaults"
+import { setBusiness } from "../components/UserDefaults"
 
 import {
 	StyleSheet,
@@ -34,16 +34,12 @@ function LoginScreen({ navigation }) {
 	const auth = getAuth()
 
 	function signInUser(username, password) {
+		if (auth.currentUser) {
+			auth.signOut()
+		}
 		signInWithEmailAndPassword(auth, username, password)
 			.then((userCredential) => {
 				// Signed in
-				const user = userCredential.user
-				console.log("here")
-				if (isBusiness(auth.currentUser.uid)) {
-					storeData("@isBusiness", "true")
-				} else {
-					storeData("@isBusiness", "false")
-				}
 				navigation.navigate("SignedIn")
 			})
 			.catch((error) => {

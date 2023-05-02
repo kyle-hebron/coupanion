@@ -11,14 +11,106 @@ import React, { useState } from "react"
 import { ThemedButton } from "react-native-really-awesome-button"
 import { TextInput } from "react-native-element-textinput"
 import Icon from "react-native-vector-icons/FontAwesome"
-//run this
-// npm i react-native-vector-icons
-// npm install --save react-native-really-awesome-button
+import { auth, db } from "../firebase"
 
 const SettingScreen = ({ navigation }) => {
 	const [isEnabled, setIsEnabled] = React.useState(false)
 	const [userName, setUserName] = useState("")
 	const [email, setEmail] = useState("")
+
+	const [expoPushToken, setExpoPushToken] = useState("")
+	const [notification, setNotification] = useState(false)
+	const notificationListener = useRef()
+	const responseListener = useRef()
+
+	const setupNotifictions = () => {
+		registerForPushNotificationsAsync().then((token) =>
+			setExpoPushToken(token)
+		)
+
+		notificationListener.current =
+			Notifications.addNotificationReceivedListener((notification) => {
+				setNotification(notification)
+			})
+
+		responseListener.current =
+			Notifications.addNotificationResponseReceivedListener(
+				(response) => {
+					console.log(response)
+				}
+			)
+
+		return () => {
+			Notifications.removeNotificationSubscription(
+				notificationListener.current
+			)
+			Notifications.removeNotificationSubscription(
+				responseListener.current
+			)
+		}
+	}
+
+	async function schedulePushNotification() {
+		await Notifications.scheduleNotificationAsync({
+			content: {
+				title: "You've got mail! 📬",
+				body: "Here is the notification body",
+				data: { data: "goes here" },
+			},
+			trigger: { seconds: 2 },
+		})
+	}
+
+	async function registerForPushNotificationsAsync() {
+		let token
+
+		if (Platform.OS === "android") {
+			await Notifications.setNotificationChannelAsync("default", {
+				name: "default",
+				importance: Notifications.AndroidImportance.MAX,
+				vibrationPattern: [0, 250, 250, 250],
+				lightColor: "#FF231F7C",
+			})
+		}
+
+		if (Device.isDevice) {
+			const { status: existingStatus } =
+				await Notifications.getPermissionsAsync()
+			let finalStatus = existingStatus
+			if (existingStatus !== "granted") {
+				const { status } = await Notifications.requestPermissionsAsync()
+				finalStatus = status
+			}
+			if (finalStatus !== "granted") {
+				Alert.alert(
+					"Failed to enable push notifications!",
+					"Open the settings app to enable them",
+					[
+						{
+							text: "Back",
+						},
+						{
+							text: "Settings",
+							onPress: () =>
+								Linking.openSettings().catch(() =>
+									Alert.alert(
+										"Error",
+										"Unable to open settings"
+									)
+								),
+						},
+					]
+				)
+				return
+			}
+			token = (await Notifications.getExpoPushTokenAsync()).data
+			console.log(token)
+		} else {
+			alert("Must use physical device for Push Notifications")
+		}
+
+		return token
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -175,6 +267,12 @@ const SettingScreen = ({ navigation }) => {
 				name="rick"
 				type="secondary"
 				style={{ marginTop: 135, marginLeft: 95 }}
+				onPress={() => {
+					auth.signOut()
+					// Log out here but also need to make sure that the user is logged out of the app
+					// For some reason I cannot go back to this screen even though I could before
+					navigation.navigate("Login")
+				}}
 			>
 				Log Out
 			</ThemedButton>

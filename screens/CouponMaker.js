@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
 	StyleSheet,
 	Text,
@@ -9,68 +9,86 @@ import {
 	View,
 	TouchableWithoutFeedback,
 	Keyboard,
-	Alert
-} from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome5";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Ionicons from "react-native-vector-icons/Ionicons";
+	Alert,
+} from "react-native"
+import Icon from "react-native-vector-icons/FontAwesome5"
+import DateTimePickerModal from "react-native-modal-datetime-picker"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import Ionicons from "react-native-vector-icons/Ionicons"
 
-import { db } from '../firebase'
-import { getAuth, updateProfile } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { db } from "../firebase"
+import { getAuth, updateProfile } from "firebase/auth"
+import { doc, setDoc, getDoc } from "firebase/firestore"
 
 const CouponMaker = ({ navigation }) => {
+	const auth = getAuth()
+	const user = auth.currentUser
 
-	const auth = getAuth();
-	const user = auth.currentUser;
+	const [titleText, setTitleText] = useState("")
+	const [codeText, setCodeText] = useState("")
+	const [discountText, setDiscountText] = useState("")
+	const [descriptionText, setDescription] = useState("")
+	const [expDate, setExpDate] = useState("Expiration")
 
-	const [titleText, setTitleText] = useState('');
-	const [codeText, setCodeText] = useState('');
-	const [discountText, setDiscountText] = useState('');
-	const [descriptionText, setDescription] = useState('');
-	const [expDate, setExpDate] = useState('Expiration');
-
-	const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+	const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
 
 	const showDatePicker = () => {
-		setDatePickerVisibility(true);
-	};
+		setDatePickerVisibility(true)
+	}
 
 	const hideDatePicker = () => {
-		setDatePickerVisibility(false);
-	};
+		setDatePickerVisibility(false)
+	}
 
 	const handleConfirm = (date) => {
-		console.warn("A date has been picked: ", removeTime(date));
-		setExpDate(removeTime(date));
-		hideDatePicker();
-	};
+		console.warn("A date has been picked: ", removeTime(date))
+		setExpDate(removeTime(date))
+		hideDatePicker()
+	}
 
 	function removeTime(date) {
-		return date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
-	  }
-
+		return (
+			date.getFullYear() +
+			"/" +
+			(date.getMonth() + 1) +
+			"/" +
+			date.getDate()
+		)
+	}
 
 	const errorAlert = () =>
-    Alert.alert('Error', 'A coupon with this code already exists.', [
-      {
-        text: 'Ok',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-    ]);
-	
+		Alert.alert("Error", "A coupon with this code already exists.", [
+			{
+				text: "Ok",
+				onPress: () => console.log("Cancel Pressed"),
+				style: "cancel",
+			},
+		])
+
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 			<SafeAreaView style={styles.container}>
 				<KeyboardAvoidingView>
 					<Text style={styles.title}>Create a coupon</Text>
 					<View style={styles.qrSection}>
-						<Ionicons name={"qr-code-outline"} size={150} color={"white"} />
+						<Ionicons
+							name={"qr-code-outline"}
+							size={150}
+							color={"white"}
+						/>
 						<View style={styles.qrSectionInput}>
-							<TextInput placeholder="Title" style={styles.input} onChangeText={newText => setTitleText(newText)}/>
-							<TextInput placeholder="Code" style={styles.input} onChangeText={newText => setCodeText(newText)}/>
+							<TextInput
+								placeholder="Title"
+								style={styles.input}
+								onChangeText={(newText) =>
+									setTitleText(newText)
+								}
+							/>
+							<TextInput
+								placeholder="Code"
+								style={styles.input}
+								onChangeText={(newText) => setCodeText(newText)}
+							/>
 						</View>
 					</View>
 					<View style={styles.bottom}>
@@ -79,10 +97,13 @@ const CouponMaker = ({ navigation }) => {
 							placeholder="Discount"
 							style={[styles.discount, styles.input]}
 							maxLength={3}
-							onChangeText={newText => setDiscountText(newText)}
+							onChangeText={(newText) => setDiscountText(newText)}
 						/>
 
-						<TouchableOpacity style={styles.date} onPress={showDatePicker}>
+						<TouchableOpacity
+							style={styles.date}
+							onPress={showDatePicker}
+						>
 							<Icon
 								style={styles.calendar}
 								name="calendar-week"
@@ -100,71 +121,81 @@ const CouponMaker = ({ navigation }) => {
 							onCancel={hideDatePicker}
 							display="inline"
 						/>
-						
 					</View>
 					<View style={styles.bottom}>
-					<TextInput
+						<TextInput
 							placeholder="Description"
 							style={[styles.discount, styles.inputs]}
-							
-							onChangeText={newText => setDescription(newText)}
+							onChangeText={(newText) => setDescription(newText)}
 						/>
 					</View>
 
-					<TouchableOpacity onPress={async () => {
-						var currentCoupons;
-						var coupons = {Coupons: {}};
-						var error = false;
+					<TouchableOpacity
+						onPress={async () => {
+							var currentCoupons
+							var coupons = {}
+							var error = false
 
-						try {
-							const docSnap = await getDoc(doc(db, "Business people", user.uid));
-							console.log(docSnap.data());
-							currentCoupons = Object.keys(docSnap.data()['Coupons']);
-							console.log(currentCoupons);
-						} catch(error) {
-							console.log(error)
-						}
-
-						coupons['Coupons'][codeText] = {
-							title: titleText,
-							description: descriptionText,
-							discount: discountText,
-							expiration: expDate,
-							couponCode: codeText,
-						};
-
-						for (var i = 0; i < currentCoupons.length; i++) {
-							if (currentCoupons[i] == codeText) {
-								error = true;
-								errorAlert();
-								console.log('Error');
+							try {
+								const docSnap = await getDoc(
+									doc(db, "Business people", user.uid)
+								)
+								console.log(docSnap.data())
+								currentCoupons = Object.keys(
+									docSnap.data()["Coupons"]
+								)
+								console.log(currentCoupons)
+							} catch (error) {
+								console.log(error)
 							}
-						}
-						if (!error) {
-							if (user) {
-								setDoc(doc(db, "Business people", user.uid), coupons, { merge: true });
 
-								alert('Coupon Created');
-
-
-							} else {
-								console.log("No Coupon Created");
-								setError("No Coupon Created");
+							coupons[codeText] = {
+								title: titleText,
+								description: descriptionText,
+								discount: discountText,
+								expiration: expDate,
+								couponCode: codeText,
 							}
-						}
-					}} style={styles.button}>
+
+							for (var i = 0; i < currentCoupons.length; i++) {
+								if (currentCoupons[i] == codeText) {
+									error = true
+									errorAlert()
+									console.log("Error")
+								}
+							}
+							if (!error) {
+								if (user) {
+									setDoc(
+										doc(db, "Business people", user.uid),
+										coupons,
+										{ merge: true }
+									)
+
+									alert("Coupon Created")
+								} else {
+									console.log("No Coupon Created")
+									setError("No Coupon Created")
+								}
+							}
+						}}
+						style={styles.button}
+					>
 						<Text styles={styles.buttonText}>Create</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={() => navigation.navigate("Verify")} style={styles.button} >
-					<Text styles={styles.buttonText}>Back</Text>
+					<TouchableOpacity
+						onPress={() => navigation.navigate("Verify")}
+						style={styles.button}
+					>
+						<Text styles={styles.buttonText}>Back</Text>
 					</TouchableOpacity>
 				</KeyboardAvoidingView>
 			</SafeAreaView>
 		</TouchableWithoutFeedback>
-	);
-};
+	)
+}
 
-export default CouponMaker;
+export default CouponMaker
 
 const styles = StyleSheet.create({
 	container: {
@@ -235,14 +266,14 @@ const styles = StyleSheet.create({
 		marginLeft: 10,
 	},
 	buttonGroup: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-        shadowOffset: { width: 1, height: 5 },
-        marginBottom: 20,
-        backgroundColor: "white"
-    },
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		shadowOpacity: 0.2,
+		shadowRadius: 3,
+		shadowOffset: { width: 1, height: 5 },
+		marginBottom: 20,
+		backgroundColor: "white",
+	},
 	discount: {},
-});
+})

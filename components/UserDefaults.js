@@ -1,22 +1,23 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
-export const storeData = async (key, value) => {
+export const setBusiness = async (value) => {
 	try {
-		await AsyncStorage.setItem(key, value);
+		console.log("Business set to: " + value)
+		await AsyncStorage.setItem("@isBusiness", value)
 	} catch (e) {
 		// saving error
-		console.log(e);
+		console.log(e)
 	}
-};
+}
 
-export const getData = async (key) => {
+export const getBusiness = async () => {
 	try {
-		const value = await AsyncStorage.getItem(key);
+		const value = await AsyncStorage.getItem("@isBusiness")
 		if (value !== null) {
-			console.log(value);
-			return value;
+			return value
 		}
 	} catch (e) {
 		// error reading value
+		console.log("No value found")
 	}
-};
+}

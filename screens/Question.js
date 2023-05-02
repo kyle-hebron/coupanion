@@ -1,5 +1,5 @@
-import React, { Component, useRef, useEffect } from "react";
-import { Slider } from "@miblanchard/react-native-slider";
+import React, { Component, useRef, useEffect } from "react"
+import { Slider } from "@miblanchard/react-native-slider"
 import {
 	StyleSheet,
 	Text,
@@ -9,11 +9,11 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	Animated,
-} from "react-native";
-import MultiSelect from "react-native-multiple-select";
+} from "react-native"
+import MultiSelect from "react-native-multiple-select"
 
-import GradientTextButton from "../components/GradientTextButton";
-import IconInput from "../components/IconInput";
+import GradientTextButton from "../components/GradientTextButton"
+import IconInput from "../components/IconInput"
 
 const clothingItemsList = [
 	{
@@ -68,7 +68,7 @@ const clothingItemsList = [
 		id: "a12",
 		name: "Beauty",
 	},
-];
+]
 
 const foodItemsList = [
 	{
@@ -111,7 +111,7 @@ const foodItemsList = [
 		id: "b9",
 		name: "Alcohol",
 	},
-];
+]
 
 const entItemsList = [
 	{
@@ -134,7 +134,7 @@ const entItemsList = [
 		id: "c4",
 		name: "Shooting Range",
 	},
-];
+]
 
 const FadeInView = (props) => {
 	/*
@@ -157,8 +157,8 @@ const FadeInView = (props) => {
 		>
 			{props.children}
 		</Animated.View>
-	);
-};
+	)
+}
 
 class Question extends Component {
 	state = {
@@ -167,24 +167,24 @@ class Question extends Component {
 		clothingItems: [],
 		foodItems: [],
 		entItems: [],
-	};
+	}
 
 	onClothingItemsChange = (clothingItems) => {
-		this.setState({ clothingItems });
-	};
+		this.setState({ clothingItems })
+	}
 
 	onFoodItemsChange = (foodItems) => {
-		this.setState({ foodItems });
-	};
+		this.setState({ foodItems })
+	}
 
 	onEntItemsChange = (entItems) => {
-		this.setState({ entItems });
-	};
+		this.setState({ entItems })
+	}
 
 	render() {
-		const { clothingItems } = this.state;
-		const { foodItems } = this.state;
-		const { entItems } = this.state;
+		const { clothingItems } = this.state
+		const { foodItems } = this.state
+		const { entItems } = this.state
 
 		return (
 			<SafeAreaView style={styles.container}>
@@ -197,7 +197,7 @@ class Question extends Component {
 									textAlign: "center",
 									margin: 10,
 									fontWeight: "bold",
-									color: "#FFFFFF"
+									color: "#FFFFFF",
 								}}
 							>
 								Welcome to Coupanion
@@ -210,17 +210,26 @@ class Question extends Component {
 							<View style={styles.innerContainer}>
 								<View style={styles.multiSelectContainer}>
 									<View
-										style={[styles.balloon, { backgroundColor: "#FFFFFF" }]}
+										style={[
+											styles.balloon,
+											{ backgroundColor: "#FFFFFF" },
+										]}
 									>
-										<Text style={styles.baseText}>Shopping</Text>
+										<Text style={styles.baseText}>
+											Shopping
+										</Text>
 										<MultiSelect
 											items={clothingItemsList}
 											uniqueKey="id"
-											onSelectedItemsChange={this.onClothingItemsChange}
+											onSelectedItemsChange={
+												this.onClothingItemsChange
+											}
 											selectedItems={clothingItems}
 											selectText="Pick Items"
 											searchInputPlaceholderText="Search Items..."
-											onChangeInput={(text) => console.warn(text)}
+											onChangeInput={(text) =>
+												console.warn(text)
+											}
 											tagRemoveIconColor="#CCC"
 											tagBorderColor="black"
 											tagTextColor="black"
@@ -236,17 +245,26 @@ class Question extends Component {
 									</View>
 									<Text />
 									<View
-										style={[styles.balloon, { backgroundColor: "#FFFFFF" }]}
+										style={[
+											styles.balloon,
+											{ backgroundColor: "#FFFFFF" },
+										]}
 									>
-										<Text style={styles.baseText}>Food</Text>
+										<Text style={styles.baseText}>
+											Food
+										</Text>
 										<MultiSelect
 											items={foodItemsList}
 											uniqueKey="id"
-											onSelectedItemsChange={this.onFoodItemsChange}
+											onSelectedItemsChange={
+												this.onFoodItemsChange
+											}
 											selectedItems={foodItems}
 											selectText="Pick Items"
 											searchInputPlaceholderText="Search Items..."
-											onChangeInput={(text) => console.warn(text)}
+											onChangeInput={(text) =>
+												console.warn(text)
+											}
 											tagRemoveIconColor="#CCC"
 											tagBorderColor="black"
 											tagTextColor="black"
@@ -262,17 +280,26 @@ class Question extends Component {
 									</View>
 									<Text />
 									<View
-										style={[styles.balloon, { backgroundColor: "#FFFFFF" }]}
+										style={[
+											styles.balloon,
+											{ backgroundColor: "#FFFFFF" },
+										]}
 									>
-										<Text style={styles.baseText}>Entertainment</Text>
+										<Text style={styles.baseText}>
+											Entertainment
+										</Text>
 										<MultiSelect
 											items={entItemsList}
 											uniqueKey="id"
-											onSelectedItemsChange={this.onEntItemsChange}
+											onSelectedItemsChange={
+												this.onEntItemsChange
+											}
 											selectedItems={entItems}
 											selectText="Pick Items"
 											searchInputPlaceholderText="Search Items..."
-											onChangeInput={(text) => console.warn(text)}
+											onChangeInput={(text) =>
+												console.warn(text)
+											}
 											tagRemoveIconColor="#CCC"
 											tagBorderColor="black"
 											tagTextColor="black"
@@ -289,23 +316,35 @@ class Question extends Component {
 
 									<Text />
 									<View
-										style={[styles.balloon, { backgroundColor: "#FFFFFF" }]}
+										style={[
+											styles.balloon,
+											{ backgroundColor: "#FFFFFF" },
+										]}
 									>
-										<Text style={styles.baseText}>Range (Radius)</Text>
+										<Text style={styles.baseText}>
+											Range (Radius)
+										</Text>
 										<Slider
 											maximumValue={100}
 											minimumValue={5}
 											step={5}
 											value={this.state.value}
-											onValueChange={(value) => this.setState({ value })}
+											onValueChange={(value) =>
+												this.setState({ value })
+											}
 										/>
 										<Text>Value: {this.state.value}</Text>
 									</View>
 									<Text />
 									<View
-										style={[styles.balloon, { backgroundColor: "#FFFFFF" }]}
+										style={[
+											styles.balloon,
+											{ backgroundColor: "#FFFFFF" },
+										]}
 									>
-										<Text style={styles.baseText}>Price</Text>
+										<Text style={styles.baseText}>
+											Price
+										</Text>
 										<Slider
 											maximumValue={100}
 											minimumValue={0}
@@ -315,10 +354,21 @@ class Question extends Component {
 												this.setState({ priceValue })
 											}
 										/>
-										<Text>Value: {this.state.priceValue}</Text>
+										<Text>
+											Value: {this.state.priceValue}
+										</Text>
 									</View>
-									<TouchableOpacity onPress={() => {this.props.navigation.navigate('SignedIn')}}>
-										<GradientTextButton text="Next" styles={styles} />
+									<TouchableOpacity
+										onPress={() => {
+											this.props.navigation.navigate(
+												"SignedIn"
+											)
+										}}
+									>
+										<GradientTextButton
+											text="Next"
+											styles={styles}
+										/>
 									</TouchableOpacity>
 								</View>
 							</View>
@@ -326,7 +376,7 @@ class Question extends Component {
 					</View>
 				</ScrollView>
 			</SafeAreaView>
-		);
+		)
 	}
 }
 
@@ -402,6 +452,6 @@ const styles = StyleSheet.create({
 		marginBottom: null,
 		resizeMode: "contain",
 	},
-});
+})
 
-export default Question;
+export default Question

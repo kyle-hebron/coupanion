@@ -1,22 +1,22 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
-import LoginScreen from "../screens/LoginScreen";
-import RegisterScreen from "../screens/RegisterScreen";
-import RegisterChoiceScreen from "../screens/RegisterChoiceScreen";
-import BusinessRegister from "../screens/BusinessRegister";
-import Question from "../screens/Question";
-import ListScreen from "../screens/ListScreen";
-import BusinessProfileScreen from "../screens/BusinessProfileScreen";
+import LoginScreen from "../screens/LoginScreen"
+import RegisterScreen from "../screens/RegisterScreen"
+import RegisterChoiceScreen from "../screens/RegisterChoiceScreen"
+import BusinessRegister from "../screens/BusinessRegister"
+import Question from "../screens/Question"
+import ListScreen from "../screens/ListScreen"
+import BusinessPage from "../screens/BusinessPage"
 import Verify from "../screens/Verify"
-import SearchScreen from "../screens/SearchScreen";
-import CouponMaker from "../screens/CouponMaker";
+import SearchScreen from "../screens/SearchScreen"
+import CouponMaker from "../screens/CouponMaker"
 
-import BottomTabNavigator from "./BottomTabNavigator";
-import BottomTabNavigatorUser from "./BottomTabNavigatorUser";
+import BottomTabNavigator from "./BottomTabNavigator"
+import BottomTabNavigatorUser from "./BottomTabNavigatorUser"
 
-import { getData } from "../components/UserDefaults";
+import { isBusiness } from "../Helpers/dbHelper"
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
 
 function AuthNavigator() {
 	return (
@@ -26,26 +26,54 @@ function AuthNavigator() {
 			}}
 			initialRouteName="Login"
 		>
-			<Stack.Screen name="Login" component={LoginScreen} />
-			<Stack.Screen name="RegisterChoice" component={RegisterChoiceScreen} />
-			<Stack.Screen name="Register" component={RegisterScreen} />
-			<Stack.Screen name="BusinessRegister" component={BusinessRegister} />
-			<Stack.Screen name="Business" component={BusinessProfileScreen} />
-			<Stack.Screen name="Question" component={Question} />
-			<Stack.Screen name="Verify" component={Verify} />
-			<Stack.Screen name="ListScreen" component={ListScreen} />
-			<Stack.Screen name="SearchScreen" component={SearchScreen} />
-			<Stack.Screen name="CouponMaker" component={CouponMaker} />
+			<Stack.Screen
+				name="Login"
+				component={LoginScreen}
+			/>
+			<Stack.Screen
+				name="RegisterChoice"
+				component={RegisterChoiceScreen}
+			/>
+			<Stack.Screen
+				name="Register"
+				component={RegisterScreen}
+			/>
+			<Stack.Screen
+				name="BusinessRegister"
+				component={BusinessRegister}
+			/>
+			<Stack.Screen
+				name="Business"
+				component={BusinessPage}
+			/>
+			<Stack.Screen
+				name="Question"
+				component={Question}
+			/>
+			<Stack.Screen
+				name="Verify"
+				component={Verify}
+			/>
+			<Stack.Screen
+				name="ListScreen"
+				component={ListScreen}
+			/>
+			<Stack.Screen
+				name="SearchScreen"
+				component={SearchScreen}
+			/>
+			<Stack.Screen
+				name="CouponMaker"
+				component={CouponMaker}
+			/>
 			<Stack.Screen
 				name="SignedIn"
 				component={
-					getData("@isBusiness") == "true"
-						? BottomTabNavigator
-						: BottomTabNavigatorUser
+					isBusiness() ? BottomTabNavigatorUser : BottomTabNavigator
 				}
 			/>
 		</Stack.Navigator>
-	);
+	)
 }
 
-export default AuthNavigator;
+export default AuthNavigator

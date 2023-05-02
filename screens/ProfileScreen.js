@@ -22,7 +22,8 @@ import {
 	getDoc,
 	doc,
 } from "firebase/firestore"
-import { auth, db } from "../firebase"
+import { auth, db, storage } from "../firebase"
+import { getDownloadURL, ref } from "firebase/storage"
 
 import * as Device from "expo-device"
 import * as Notifications from "expo-notifications"
@@ -37,17 +38,14 @@ Notifications.setNotificationHandler({
 
 export default function BusinessPage({ navigation }) {
 	const [username, setUsername] = useState("")
-
-	const [expoPushToken, setExpoPushToken] = useState("")
-	const [notification, setNotification] = useState(false)
-	const notificationListener = useRef()
-	const responseListener = useRef()
+	const [profilePicture, setProfilePicture] = useState("")
 
 	useEffect(() => {
 		const fetchData = async () => {
 			getDoc(doc(db, "users", auth.currentUser.uid)).then((docSnap) => {
 				if (docSnap.exists()) {
 					setUsername(docSnap.data().username)
+					setProfilePicture("images/" + docSnap.data().profilePicture)
 				} else {
 					console.log("No such document!")
 				}
@@ -55,32 +53,13 @@ export default function BusinessPage({ navigation }) {
 		}
 
 		fetchData()
-	}, [])
-
-	useEffect(() => {
-		registerForPushNotificationsAsync().then((token) =>
-			setExpoPushToken(token)
-		)
-
-		notificationListener.current =
-			Notifications.addNotificationReceivedListener((notification) => {
-				setNotification(notification)
+		// Make sure the profile picture is actually loaded otherwise an error will be thrown
+		if (profilePicture) {
+			const fileRef = ref(storage, profilePicture)
+			getDownloadURL(fileRef).then((url) => {
+				setProfilePicture(url)
+				console.log(url)
 			})
-
-		responseListener.current =
-			Notifications.addNotificationResponseReceivedListener(
-				(response) => {
-					console.log(response)
-				}
-			)
-
-		return () => {
-			Notifications.removeNotificationSubscription(
-				notificationListener.current
-			)
-			Notifications.removeNotificationSubscription(
-				responseListener.current
-			)
 		}
 	}, [])
 
@@ -134,7 +113,7 @@ export default function BusinessPage({ navigation }) {
 				</View>
 				<View style={styles.balloon}>
 					<Image
-						source={require("../assets/logos/wendy.png")}
+						source={{ uri: profilePicture }}
 						style={styles.logo}
 					/>
 
@@ -194,73 +173,9 @@ export default function BusinessPage({ navigation }) {
 						View all
 					</Text>
 				</TouchableOpacity>
-
-				<TouchableOpacity></TouchableOpacity>
 			</ScrollView>
 		</SafeAreaView>
 	)
-
-	async function schedulePushNotification() {
-		await Notifications.scheduleNotificationAsync({
-			content: {
-				title: "You've got mail! 📬",
-				body: "Here is the notification body",
-				data: { data: "goes here" },
-			},
-			trigger: { seconds: 2 },
-		})
-	}
-
-	async function registerForPushNotificationsAsync() {
-		let token
-
-		if (Platform.OS === "android") {
-			await Notifications.setNotificationChannelAsync("default", {
-				name: "default",
-				importance: Notifications.AndroidImportance.MAX,
-				vibrationPattern: [0, 250, 250, 250],
-				lightColor: "#FF231F7C",
-			})
-		}
-
-		if (Device.isDevice) {
-			const { status: existingStatus } =
-				await Notifications.getPermissionsAsync()
-			let finalStatus = existingStatus
-			if (existingStatus !== "granted") {
-				const { status } = await Notifications.requestPermissionsAsync()
-				finalStatus = status
-			}
-			if (finalStatus !== "granted") {
-				Alert.alert(
-					"Failed to enable push notifications!",
-					"Open the settings app to enable them",
-					[
-						{
-							text: "Back",
-						},
-						{
-							text: "Settings",
-							onPress: () =>
-								Linking.openSettings().catch(() =>
-									Alert.alert(
-										"Error",
-										"Unable to open settings"
-									)
-								),
-						},
-					]
-				)
-				return
-			}
-			token = (await Notifications.getExpoPushTokenAsync()).data
-			console.log(token)
-		} else {
-			alert("Must use physical device for Push Notifications")
-		}
-
-		return token
-	}
 }
 
 const styles = StyleSheet.create({

@@ -1,5 +1,5 @@
-import React, { Component, useRef, useEffect, useState } from "react";
-import Icon from "react-native-vector-icons/FontAwesome5";
+import React, { useEffect, useState } from "react"
+import Icon from "react-native-vector-icons/FontAwesome5"
 import {
 	StyleSheet,
 	Text,
@@ -12,56 +12,117 @@ import {
 	ScrollView,
 	Button,
 	GradientTextButton,
-} from "react-native";
+} from "react-native"
 import { useRoute } from "@react-navigation/native"
-import { Linking } from "react-native";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
-import MapView from "react-native-maps";
+import { Linking } from "react-native"
+import { collection, query, where, getDocs } from "firebase/firestore"
+import { db } from "../firebase"
+import MapView, { Marker } from "react-native-maps"
+import locationiq from "react-native-locationiq"
 
-//import ThumbsUpDownIcon from '@mui/icons-material/ThumbsUpDown';
-//Yes, I know this is ugly -Kyle
-export default function BusinessPage({ navigation }) {
-	const [users, setUsers] = useState(" ");
-	const [address, setAddress] = useState(" ");
-	const [city, setCity] = useState(" ");
-	const [number, setNumber] = useState(" ");
-	const [zip, setZip] = useState(" ");
-	const [state, setState] = useState(" ");
-	const [pfp, setPfp] = useState(" ");
-	//const [pic, setPic] = useState(" ");
-	const route = useRoute();
-	const id = route.params?.id;
+locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
+
+export default function BusinessProfileScreen({ navigation }) {
+	const [users, setUsers] = useState(" ")
+	const [address, setAddress] = useState(" ")
+	const [city, setCity] = useState(" ")
+	const [number, setNumber] = useState(" ")
+	const [zip, setZip] = useState(" ")
+	const [state, setState] = useState(" ")
+	const [pfp, setPfp] = useState(" ")
+	const [pic, setPic] = useState(" ")
+	const [countUp, setCountUp] = useState(0) // For rating .
+	const [countDown, setCountDown] = useState(0) // For rating .
+	const [selected, setSelected] = useState(null) // For rating .
+	const [coordinates, setCoordinates] = useState(null) // For map .
+	const route = useRoute()
+	const id = route.params?.id
 
 	useEffect(() => {
 		async function fetchData() {
-			const q = query(collection(db, "Business people"));
-			const querySnapshot = await getDocs(q);
-			const users = [];
+			const q = query(collection(db, "Business people"))
+			const querySnapshot = await getDocs(q)
+			const users = []
 			querySnapshot.forEach((doc) => {
 				if (doc.id === id) {
-					const business = doc.data().business;
-					const address = doc.data().AddressInfo.address1;
-					const city = doc.data().AddressInfo.city;
-					const number = doc.data().phone;
-					const zip = doc.data().AddressInfo.zip;
-					const state = doc.data().AddressInfo.state;
-					const pfp = doc.data().pfp;
-					//const pic = doc.data().pic;
+					const business = doc.data().business
+					const address = doc.data().AddressInfo.address1
+					const city = doc.data().AddressInfo.city
+					const number = doc.data().phone
+					const zip = doc.data().AddressInfo.zip
+					const state = doc.data().AddressInfo.state
+					const pfp = doc.data().pfp
+					const countUp = doc.data().thumbUp
+					const countDown = doc.data().thumbDown
+					const pic = { uri: doc.data().image }
 
-					setUsers(business);
-					setAddress(address);
-					setCity(city);
-					setNumber(number);
-					setZip(zip);
-					setState(state);
-					setPfp(pfp);
-					//setPic(pic);
+					setUsers(business)
+					setAddress(address)
+					setCity(city)
+					setNumber(number)
+					setZip(zip)
+					setState(state)
+					setPfp(pfp)
+					setCountUp(countUp)
+					setCountDown(countDown)
+					setPic(pic)
+
+					// Call LocationIQ API to convert address to coordinates .
+					locationiq
+						.search(`${address}, ${city}, ${state} ${zip}`)
+						.then((response) => {
+							const { lat, lon } = response[0]
+							setCoordinates({ latitude: lat, longitude: lon })
+						})
+						.catch((error) => console.warn(error))
 				}
-			});
+			})
 		}
-		fetchData();
-	}, []);
+		fetchData()
+	}, [])
+
+	// A function to handle upvotes and downvotes , and to update the count of each accordingly .
+	const handleVote = (type) => {
+		if (type === selected) {
+			setSelected(null)
+			if (type === "up") {
+				setCountUp(countUp - 1)
+				db.collection("Business people")
+					.doc(id)
+					.update({ thumbUp: increment(-1) })
+			} else {
+				setCountDown(countDown - 1)
+				db.collection("Business people")
+					.doc(id)
+					.update({ thumbDown: increment(-1) })
+			}
+		} else {
+			setSelected(type)
+			if (type === "up") {
+				setCountUp(countUp + 1)
+				db.collection("Business people")
+					.doc(id)
+					.update({ thumbUp: increment(1) })
+				if (selected === "down") {
+					setCountDown(countDown - 1)
+					db.collection("Business people")
+						.doc(id)
+						.update({ thumbDown: increment(-1) })
+				}
+			} else {
+				setCountDown(countDown + 1)
+				db.collection("Business people")
+					.doc(id)
+					.update({ thumbDown: increment(1) })
+				if (selected === "up") {
+					setCountUp(countUp - 1)
+					db.collection("Business people")
+						.doc(id)
+						.update({ thumbUp: increment(-1) })
+				}
+			}
+		}
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -79,7 +140,10 @@ export default function BusinessPage({ navigation }) {
 					Profile
 				</Text>
 				<View style={styles.balloon}>
-					<Image source={require("../assets/logos/wendy.png")} style={styles.logo} />
+					<Image
+						source={pic}
+						style={styles.logo}
+					/>
 					<View style={{ paddingHorizontal: 15 }}>
 						<Text
 							style={{
@@ -90,15 +154,13 @@ export default function BusinessPage({ navigation }) {
 						>
 							{users}
 						</Text>
-						<Text style={styles.name}>
-							{address}
-						</Text>
+						<Text style={styles.name}>{address}</Text>
 						<Text style={styles.name}>
 							{city}, {state}, {zip}
 						</Text>
 						<Text
 							onPress={() => {
-								Linking.openURL(number);
+								Linking.openURL(number)
 							}}
 							style={styles.name}
 						>
@@ -109,34 +171,53 @@ export default function BusinessPage({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={{alignItems: "center"}}>
+				<View style={{ alignItems: "center" }}>
 					<View style={styles.couponPack}>
-						<Icon style={styles.icon} name="qrcode" size={50} color="#000"/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>Coupon #1</Text>
+						<Icon
+							style={styles.icon}
+							name="qrcode"
+							size={50}
+							color="#000"
+						/>
+						<Text style={{ fontSize: 40, textAlign: "center" }}>
+							Coupon #1
+						</Text>
 					</View>
 					<View style={styles.couponPack}>
-						<Icon style={styles.icon} name="qrcode" size={50} color="#000"/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>Coupon #2</Text>
+						<Icon
+							style={styles.icon}
+							name="qrcode"
+							size={50}
+							color="#000"
+						/>
+						<Text style={{ fontSize: 40, textAlign: "center" }}>
+							Coupon #2
+						</Text>
 					</View>
 				</View>
-
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
 					onPress={() => {
-						alert("No other coupons available");
+						navigation.navigate("Verify")
 					}}
 				>
-					<Text style={{ fontSize: 15, color: "white", paddingHorizontal: 25 }}>
+					<Text
+						style={{
+							fontSize: 15,
+							color: "white",
+							paddingHorizontal: 25,
+						}}
+					>
 						View all
 					</Text>
 				</TouchableOpacity>
 
-				<View style={{flexDirection: "column", marginBottom: 10}}>
+				<View style={{ flexDirection: "column", marginBottom: 10 }}>
 					<Text style={styles.titles}>Hours:</Text>
 					<View style={styles.openingTimes}>
 						<Text style={styles.time}>Sunday </Text>
-						
+
 						<Text style={styles.time}>6:30AM - 12:00AM</Text>
 					</View>
 					<View style={styles.openingTimes}>
@@ -173,7 +254,9 @@ export default function BusinessPage({ navigation }) {
 
 				<Text style={styles.titles}>Find us</Text>
 				<View style={{ flex: 1, height: 250 }}>
-					<MapView style={styles.map} />
+					<MapView style={styles.map}>
+						{coordinates && <Marker coordinate={coordinates} />}
+					</MapView>
 				</View>
 
 				<View style={{ flexDirection: "row", marginTop: 50 }}>
@@ -181,7 +264,7 @@ export default function BusinessPage({ navigation }) {
 						<TouchableOpacity
 							style={styles.buttonGroup}
 							onPress={() => {
-								alert("Menu not yet available");
+								alert("Menu not yet available")
 							}}
 						>
 							<Text
@@ -200,7 +283,7 @@ export default function BusinessPage({ navigation }) {
 						<TouchableOpacity
 							style={styles.buttonGroup}
 							onPress={() => {
-								alert("No photos available");
+								alert("No photos available")
 							}}
 						>
 							<Text
@@ -217,8 +300,28 @@ export default function BusinessPage({ navigation }) {
 					</View>
 				</View>
 
-				<View style={{ marginTop: 15, alignItems: "center"}}>
-					<Text style={styles.titles}>Reviews</Text>
+				<Text style={styles.titles}>Rating and Reviews</Text>
+
+				<View style={styles.rating}>
+					<TouchableOpacity onPress={() => handleVote("up")}>
+						<Icon
+							name="thumbs-up"
+							size={35}
+							color={selected === "up" ? "green" : "black"}
+						/>
+					</TouchableOpacity>
+					<Text style={styles.count}>{countUp}</Text>
+					<TouchableOpacity onPress={() => handleVote("down")}>
+						<Icon
+							name="thumbs-down"
+							size={35}
+							color={selected === "down" ? "red" : "black"}
+						/>
+					</TouchableOpacity>
+					<Text style={styles.count}>{countDown}</Text>
+				</View>
+
+				<View style={{ marginTop: 15, alignItems: "center" }}>
 					<View style={styles.balloonBackground}>
 						<View style={{ flexDirection: "row" }}>
 							<Text style={styles.reviewName}>Kristen</Text>
@@ -226,23 +329,28 @@ export default function BusinessPage({ navigation }) {
 							<Text style={styles.reviewName}>2 weeks ago</Text>
 						</View>
 						<Text style={styles.reviewText}>
-							I wish I could give it zero stars. The front register girl was
-							probably brand new but she spoke at a whisper even after asking
-							her 3 times to repeat herself. We showed patience and grace, even
-							after being told they had no lettuce and finding their drink
-							machine was out of almost every drink and the poor young gentleman
-							behind the counter had to assist with my drink because the girl
-							from before just didn't understand that the drinks were all out.
-							We went to use the women's restroom before we left but the smell
-							of sewer made us nearly vomit. We got out to the car only to
-							discover my mothers burger was made wrong(literally had meat and a
-							tomatoe since they were out of lettuce). I am extremely upset with
-							this whole experience. The young guy behind the counter is the
-							only person I can give props to. After we returned to get the
-							burger exchanged, he was the one I saw servicing the drink
-							machine. He was the one that spoke up and helped us. Everyone else
-							seemed clueless or just wanted to stand behind the counter and
-							watch what was happening.{" "}
+							I wish I could give it zero stars. The front
+							register girl was probably brand new but she spoke
+							at a whisper even after asking her 3 times to repeat
+							herself. We showed patience and grace, even after
+							being told they had no lettuce and finding their
+							drink machine was out of almost every drink and the
+							poor young gentleman behind the counter had to
+							assist with my drink because the girl from before
+							just didn't understand that the drinks were all out.
+							We went to use the women's restroom before we left
+							but the smell of sewer made us nearly vomit. We got
+							out to the car only to discover my mothers burger
+							was made wrong(literally had meat and a tomatoe
+							since they were out of lettuce). I am extremely
+							upset with this whole experience. The young guy
+							behind the counter is the only person I can give
+							props to. After we returned to get the burger
+							exchanged, he was the one I saw servicing the drink
+							machine. He was the one that spoke up and helped us.
+							Everyone else seemed clueless or just wanted to
+							stand behind the counter and watch what was
+							happening.{" "}
 						</Text>
 					</View>
 
@@ -253,15 +361,17 @@ export default function BusinessPage({ navigation }) {
 							<Text style={styles.reviewName}>2 years ago</Text>
 						</View>
 						<Text style={styles.reviewText}>
-							Was standing in the lobby At 9:15 a.m.15 minutes prior to official
-							opening of doors. Could not take my order for some reason. But
-							tells me I can go through the drive-through.Apparently it was a
-							more of a hassle for them to take my order in the lobby Then it
-							would for me to get back in my Big a** truck and try to squeeze it
-							through the drive-through. Took my business somewhere else. Its
-							mazing how we provide business to places but the employees don't
-							wanna take that little extra Effort And still wanna get paid $15
-							an hour.{" "}
+							Was standing in the lobby At 9:15 a.m.15 minutes
+							prior to official opening of doors. Could not take
+							my order for some reason. But tells me I can go
+							through the drive-through.Apparently it was a more
+							of a hassle for them to take my order in the lobby
+							Then it would for me to get back in my Big a** truck
+							and try to squeeze it through the drive-through.
+							Took my business somewhere else. Its mazing how we
+							provide business to places but the employees don't
+							wanna take that little extra Effort And still wanna
+							get paid $15 an hour.{" "}
 						</Text>
 					</View>
 				</View>
@@ -269,16 +379,23 @@ export default function BusinessPage({ navigation }) {
 				<TouchableOpacity
 					style={{ flexDirection: "row-reverse" }}
 					onPress={() => {
-						alert("No other reviews");
+						alert("No other reviews")
 					}}
 				>
-					<Text style={{ fontSize: 15, color: "white", paddingHorizontal: 25, marginBottom: 10 }}>
+					<Text
+						style={{
+							fontSize: 15,
+							color: "white",
+							paddingHorizontal: 25,
+							marginBottom: 10,
+						}}
+					>
 						View all
 					</Text>
 				</TouchableOpacity>
 			</ScrollView>
 		</SafeAreaView>
-	);
+	)
 }
 
 const styles = StyleSheet.create({
@@ -308,14 +425,14 @@ const styles = StyleSheet.create({
 	},
 
 	couponPack: {
-		justifyContent: 'space-between',
+		justifyContent: "space-between",
 		paddingHorizontal: 20,
 		paddingTop: 10,
 		paddingBottom: 15,
 		marginBottom: 10,
 		borderRadius: 20,
 		width: "90%",
-		flexDirection: 'row',
+		flexDirection: "row",
 		alignItems: "center",
 		backgroundColor: "white",
 	},
@@ -353,17 +470,16 @@ const styles = StyleSheet.create({
 	},
 
 	titles: {
-		alignItems: "left",
+		textAlign: "center",
 		fontSize: 32,
 		color: "white",
 		fontWeight: "bold",
-		marginLeft: 10,
 		marginTop: 15,
 		marginBottom: 10,
 	},
 
 	openingTimes: {
-		justifyContent: 'space-between',
+		justifyContent: "space-between",
 		flexDirection: "row",
 		paddingHorizontal: 20,
 		marginLeft: 10,
@@ -390,4 +506,15 @@ const styles = StyleSheet.create({
 		alignSelf: "center",
 		borderRadius: 25,
 	},
-});
+	rating: {
+		flexDirection: "row",
+		justifyContent: "space-evenly",
+		alignItems: "center",
+		paddingHorizontal: 25,
+		paddingVertical: 10,
+	},
+	count: {
+		fontSize: 10,
+		color: "white",
+	},
+})

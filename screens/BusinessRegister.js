@@ -19,6 +19,7 @@ import { db } from "../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { getAuth, updateProfile } from "firebase/auth"
 import { doc, setDoc, getDoc } from "firebase/firestore"
+import { setBusiness } from "../components/UserDefaults"
 
 export default function BusinessRegister({ navigation }) {
 	//const {isBusiness} = route.params;
@@ -106,10 +107,10 @@ export default function BusinessRegister({ navigation }) {
 						state: state,
 						zip: zip,
 					},
+					Coupons: {},
 				},
 				{ merge: true }
 			)
-
 			navigation.navigate("SignedIn")
 		} else {
 			console.log("No Business Created")

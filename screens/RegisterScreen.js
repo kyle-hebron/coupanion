@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
 	StyleSheet,
 	Text,
@@ -6,50 +6,71 @@ import {
 	SafeAreaView,
 	Image,
 	TouchableOpacity,
-} from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome5";
-import * as ImagePicker from "expo-image-picker";
+} from "react-native"
+import Icon from "react-native-vector-icons/FontAwesome5"
+import * as ImagePicker from "expo-image-picker"
 
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase"
 import {
 	createUserWithEmailAndPassword,
 	onAuthStateChanged,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+} from "firebase/auth"
+import { doc, setDoc } from "firebase/firestore"
 
-import GradientIconButton from "../components/GradientIconButton";
-import GradientTextButton from "../components/GradientTextButton";
-import IconInput from "../components/IconInput";
-import { storeData } from "../components/UserDefaults";
+import GradientIconButton from "../components/GradientIconButton"
+import GradientTextButton from "../components/GradientTextButton"
+import IconInput from "../components/IconInput"
+import { setBusiness } from "../components/UserDefaults"
 
 export default function RegisterScreen({ route, navigation }) {
-	const { isBusiness } = route.params;
-	const [username, setUsername] = useState("");
-	const [email, setEmail] = useState(null);
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-	const [error, setError] = useState("");
-	const [image, setImage] = useState(null);
-	const [selectedImage, setSelectedImage] = useState(null);
+	const { isBusiness } = route.params
+	const [username, setUsername] = useState("")
+	const [email, setEmail] = useState(null)
+	const [password, setPassword] = useState("")
+	const [confirmPassword, setConfirmPassword] = useState("")
+	const [error, setError] = useState("")
+	const [image, setImage] = useState(null)
+	const [filePath, setFilePath] = useState("")
+	const [isUploading, setIsUploading] = useState(false)
 
 	const pickImage = async () => {
 		// No permissions request is necessary for launching the image library
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
-		});
+		})
 
-		if (!result.canceled) {
-			setImage(result.assets[0].uri);
+		const source = { uri: result.uri }
+		setImage(source)
+	}
+
+	const uploadImage = async () => {
+		setIsUploading(true)
+		const response = await fetch(image.uri)
+		const blob = await response.blob()
+		const fileName = image.uri.substring(image.uri.lastIndexOf("/") + 1)
+		var ref = storage
+			.ref()
+			.child("images/" + fileName)
+			.put(blob)
+
+		console.log(filePath + "file name" + fileName)
+		try {
+			await ref
+		} catch (e) {
+			console.log(e)
 		}
-	};
+		setIsUploading(false)
+		console.log("Image uploaded successfully")
+		setImage(null)
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.top}>
 				<TouchableOpacity
 					onPress={() => {
-						navigation.navigate("RegisterChoice");
+						navigation.navigate("RegisterChoice")
 					}}
 				>
 					<GradientIconButton
@@ -70,7 +91,7 @@ export default function RegisterScreen({ route, navigation }) {
 					/>
 					{image && (
 						<Image
-							source={{ uri: image }}
+							source={{ uri: image.uri }}
 							style={{
 								width: 120,
 								height: 120,
@@ -111,7 +132,9 @@ export default function RegisterScreen({ route, navigation }) {
 			</View>
 			<View styles={styles.bottom}>
 				<TouchableOpacity
-					onPress={() => signUpUser(username, password, confirmPassword, email)}
+					onPress={() =>
+						signUpUser(username, password, confirmPassword, email)
+					}
 				>
 					<GradientTextButton
 						text={isBusiness ? "Next" : "Sign Up"}
@@ -121,43 +144,58 @@ export default function RegisterScreen({ route, navigation }) {
 			</View>
 			<Text>{error}</Text>
 		</SafeAreaView>
-	);
+	)
 
 	function signUpUser(username, password, confirmPassword, email) {
 		if (password === confirmPassword && password != "") {
 			createUserWithEmailAndPassword(auth, email, password)
 				.then((res) => {
-					console.log(res.user);
-					setError("");
+					console.log(res.user)
+					setError("")
 				})
-				.catch((err) => setError(err.message));
+				.catch((err) => setError(err.message))
 			onAuthStateChanged(auth, (user) => {
 				if (user) {
+					setFilePath(
+						image.uri.substring(image.uri.lastIndexOf("/") + 1)
+					)
 					//If they're a business, register as a business
 					if (isBusiness) {
+						uploadImage()
 						setDoc(doc(db, "Business people", user.uid), {
 							uid: user.uid,
 							username: username,
 							email: email,
-						});
-						storeData("@isBusiness", "true");
-						navigation.navigate("BusinessRegister");
+							profilePicture: filePath
+								? filePath
+								: image.uri.substring(
+										image.uri.lastIndexOf("/") + 1
+								  ),
+						})
+
+						navigation.navigate("BusinessRegister")
 					} else {
+						uploadImage()
 						setDoc(doc(db, "users", user.uid), {
 							uid: user.uid,
 							username: username,
 							email: email,
-						});
-						storeData("@isBusiness", "false");
-						navigation.navigate("Question");
+							profilePicture: filePath
+								? filePath
+								: image.uri.substring(
+										image.uri.lastIndexOf("/") + 1
+								  ),
+						})
+
+						navigation.navigate("Question")
 					}
 				} else {
 					//console.log("No user logged in")
 					//setError("No user logged in")
 				}
-			});
+			})
 		} else {
-			setError("Passwords do not match");
+			setError("Passwords do not match")
 		}
 	}
 }
@@ -189,4 +227,4 @@ const styles = StyleSheet.create({
 		marginBottom: 15,
 		color: "#949494",
 	},
-});
+})

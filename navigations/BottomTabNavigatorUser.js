@@ -8,7 +8,7 @@ import SearchScreen from "../screens/SearchScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 import SettingScreen from "../screens/SettingScreen"
 
-import { getData } from "../components/UserDefaults"
+import { getBusiness } from "../components/UserDefaults"
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
