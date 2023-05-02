@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Linking } from "react-native";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, increment } from "firebase/firestore";
 import { db } from "../firebase";
 import MapView, { Marker } from "react-native-maps";
 import locationiq from "react-native-locationiq";
