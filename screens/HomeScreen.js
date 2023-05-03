@@ -10,10 +10,14 @@ import {
 	TouchableOpacity,
 } from "react-native";
 import { db } from "../firebase";
+import { getAuth, updateProfile } from "firebase/auth";
 
 function HomeScreen({ navigation }) {
 	const [trendingBusinesses, setTrendingBusinesses] = useState([]);
 	const [topRatedBusinesses, setTopRatedBusinesses] = useState([]);
+	const auth = getAuth();
+	const user = auth.currentUser;
+    const userID = user.uid;
 
 	useEffect(() => {
 		// Get trending businesses from Firestore .
@@ -34,23 +38,35 @@ function HomeScreen({ navigation }) {
 			setTrendingBusinesses(businesses);
 		});
 
-		// Get top rated businesses from Firestore .
-		const topRatedBusinessesRef = db
-			.collection("Business people")
-			.where("top rated", "==", true);
-		const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot((snapshot) => {
-			const businesses = [];
-			snapshot.forEach((doc) => {
-				const data = doc.data();
-				businesses.push({
-					id: doc.id,
-					name: data.business,
-					tag: data.tag,
-					image: { uri: data.image },
-				});
-			});
-			setTopRatedBusinesses(businesses);
-		});
+		
+		 
+
+
+const userDocRef = db.collection("users").doc(userID);
+
+
+const unsubscribeUserTags = userDocRef.onSnapshot((userDocSnapshot) => {
+  const userData = userDocSnapshot.data();
+  const userTags = userData.tags || []; 
+  const topRatedBusinessesRef = db
+    .collection("Business people")
+    
+    .where("tags", "array-contains-any", userTags);
+
+  const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot((snapshot) => {
+    const businesses = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      businesses.push({
+        id: doc.id,
+        name: data.business,
+        tag: data.tag,
+        image: { uri: data.image },
+      });
+    });
+    setTopRatedBusinesses(businesses);
+  });
+});
 
 		return () => {
 			unsubscribeTrending();
@@ -86,7 +102,7 @@ function HomeScreen({ navigation }) {
 				/>
 			</View>
 			<View style={styles.topRatedContainer}>
-				<Text style={styles.topRatedText}>Top Rated</Text>
+				<Text style={styles.topRatedText}>For you</Text>
 				<FlatList
 					data={topRatedBusinesses}
 					renderItem={renderItem}
