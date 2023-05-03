@@ -7,7 +7,8 @@ import BusinessRegister from "../screens/BusinessRegister";
 import Question from "../screens/Question";
 import ListScreen from "../screens/ListScreen";
 import BusinessProfileScreen from "../screens/BusinessProfileScreen";
-import Verify from "../screens/Verify"
+import Verify from "../screens/Verify";
+import ViewCoupons from "../screens/ViewCoupons";
 import SearchScreen from "../screens/SearchScreen";
 import CouponMaker from "../screens/CouponMaker";
 import QuestionBusiness from "../screens/QuestionBusiness";
@@ -34,6 +35,7 @@ function AuthNavigator() {
 			<Stack.Screen name="Business" component={BusinessProfileScreen} />
 			<Stack.Screen name="Question" component={Question} />
 			<Stack.Screen name="Verify" component={Verify} />
+			<Stack.Screen name="ViewCoupons" component={ViewCoupons} />
 			<Stack.Screen name="ListScreen" component={ListScreen} />
 			<Stack.Screen name="SearchScreen" component={SearchScreen} />
 			<Stack.Screen name="CouponMaker" component={CouponMaker} />
