@@ -30,6 +30,7 @@ function LoginScreen({ navigation }) {
 	const [user, setUser] = useState()
 	const [userData, setUserdata] = useState({})
 	const [error, setError] = useState("")
+	const [loading, setLoading] = useState(false)
 
 	const auth = getAuth()
 
@@ -40,13 +41,24 @@ function LoginScreen({ navigation }) {
 		signInWithEmailAndPassword(auth, username, password)
 			.then((userCredential) => {
 				// Signed in
-				navigation.navigate("SignedIn")
+				setLoading(true)
 			})
 			.catch((error) => {
 				const errorCode = error.code
 				const errorMessage = error.message
+				setError(errorMessage)
+				setLoading(false)
 			})
 	}
+
+	//Once we have comfirmed that the user is signed in, we can go to the signed in screen
+	onAuthStateChanged(auth, (user) => {
+		if (user) {
+			navigation.navigate("SignedIn")
+		} else {
+			console.log("User is signed out")
+		}
+	})
 
 	return (
 		<KeyboardAvoidingView style={styles.container}>

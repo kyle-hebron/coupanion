@@ -33,14 +33,14 @@ import { getDownloadURL, ref } from "firebase/storage"
 locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
 
 export default function BusinessProfileScreen({ navigation }) {
-	const [username, setUsername] = useState(" ")
-	const [address, setAddress] = useState(" ")
-	const [city, setCity] = useState(" ")
-	const [number, setNumber] = useState(" ")
-	const [zip, setZip] = useState(" ")
-	const [state, setState] = useState(" ")
-	const [pfp, setPfp] = useState(" ")
-	const [profilePicture, setProfilePicture] = useState(" ")
+	const [username, setUsername] = useState("")
+	const [address, setAddress] = useState("")
+	const [city, setCity] = useState("")
+	const [number, setNumber] = useState("")
+	const [zip, setZip] = useState("")
+	const [state, setState] = useState("")
+	const [pfp, setPfp] = useState("")
+	const [profilePicture, setProfilePicture] = useState("")
 	const [countUp, setCountUp] = useState(0) // For rating .
 	const [countDown, setCountDown] = useState(0) // For rating .
 	const [selected, setSelected] = useState(null) // For rating .
@@ -51,50 +51,59 @@ export default function BusinessProfileScreen({ navigation }) {
 	const id = route.params?.id
 
 	useEffect(() => {
-		async function fetchData() {
-			getDoc(doc(db, "Business people", auth.currentUser.uid)).then(
-				(docSnap) => {
-					if (docSnap.exists()) {
-						setUsername(docSnap.data().username)
-						setAddress(docSnap.data().AddressInfo.address1)
-						setCity(docSnap.data().AddressInfo.city)
-						setNumber(docSnap.data().phone)
-						setZip(docSnap.data().AddressInfo.zip)
-						setState(docSnap.data().AddressInfo.state)
-						setCountUp(docSnap.data().thumbUp)
-						setCountDown(docSnap.data().thumbDown)
-						setProfilePicture(
-							"images/" + docSnap.data().profilePicture
-						)
-					} else {
-						console.log("No such document!")
-					}
-				}
-			)
-
-			// Call LocationIQ API to convert address to coordinates .
-			locationiq
-				.search(`${address}, ${city}, ${state} ${zip}`)
-				.then((response) => {
-					const { lat, lon } = response[0]
-					setCoordinates({ latitude: lat, longitude: lon })
-				})
-				.catch((error) => console.warn(error))
-		}
-
+		console.log("PROFILEPIC GBEGG" + profilePicture)
 		fetchData()
-		getProfilePicture()
-		getCoupons()
-
 		// Make sure the profile picture is actually loaded otherwise an error will be thrown
 	}, [])
 
-	//Gets the coupon list from the database and then makes sure that we are only displaying the first two coupons
-	async function getCoupons() {
-		const docSnap = await getDoc(
-			doc(db, "Business people", auth.currentUser.uid)
+	async function fetchData() {
+		getDoc(doc(db, "Business people", auth.currentUser.uid)).then(
+			(docSnap) => {
+				if (docSnap.exists()) {
+					setUsername(docSnap.data().username)
+					setAddress(docSnap.data().AddressInfo.address1)
+					setCity(docSnap.data().AddressInfo.city)
+					setNumber(docSnap.data().phone)
+					setZip(docSnap.data().AddressInfo.zip)
+					setState(docSnap.data().AddressInfo.state)
+					setCountUp(docSnap.data().thumbUp)
+					setCountDown(docSnap.data().thumbDown)
+					if (!profilePicture.length > 0) {
+						setProfilePicture(
+							"gs://coupanion-96203.appspot.com/images/" +
+								docSnap.data().profilePicture
+						)
+					}
+					setCoupons(docSnap.data().coupons)
+					console.log(profilePicture)
+					console.log(coupons)
+					console.log("ZIP CODE" + zip)
+
+					if (profilePicture.length > 0) {
+						console.log("Getting profile picture")
+						getProfilePicture()
+					}
+					if (coupons) {
+						getCoupons()
+					}
+				} else {
+					console.log("No such document!")
+				}
+			}
 		)
-		setCoupons(docSnap.data().coupons)
+
+		// Call LocationIQ API to convert address to coordinates .
+		locationiq
+			.search(`${address}, ${city}, ${state} ${zip}`)
+			.then((response) => {
+				const { lat, lon } = response[0]
+				setCoordinates({ latitude: lat, longitude: lon })
+			})
+			.catch((error) => console.warn(error))
+	}
+
+	//Gets the coupon list from the database and then makes sure that we are only displaying the first two coupons
+	function getCoupons() {
 		// If there are enough coupons, get the first two and store them in displayedCoupons
 		if (Object.keys(coupons).length >= 2) {
 			const firstTwoCoupons = [coupons[0], coupons[1]]
@@ -104,10 +113,24 @@ export default function BusinessProfileScreen({ navigation }) {
 		}
 	}
 
+	useEffect(() => {
+		getCoupons()
+	}, [coupons])
+
+	useEffect(() => {
+		getProfilePicture()
+	}, [profilePicture])
+
 	async function getProfilePicture() {
-		await getDownloadURL(ref(storage, profilePicture)).then((url) => {
-			setProfilePicture(url)
-		})
+		console.log("PROFILE PICTURE" + profilePicture)
+		if (profilePicture.startsWith("gs://")) {
+			await storage
+				.refFromURL(profilePicture)
+				.getDownloadURL()
+				.then((url) => {
+					setProfilePicture(url)
+				})
+		}
 	}
 
 	const couponItem = ({ item }) => (
@@ -203,10 +226,16 @@ export default function BusinessProfileScreen({ navigation }) {
 					</TouchableOpacity>
 				</View>
 				<View style={styles.balloon}>
-					<Image
-						source={{ uri: profilePicture }}
-						style={styles.logo}
-					/>
+					{profilePicture.startsWith("https") > 0 ? (
+						<Image
+							source={{
+								uri: profilePicture,
+							}}
+							style={styles.logo}
+						/>
+					) : (
+						<Text>Loading...</Text>
+					)}
 					<View style={{ paddingHorizontal: 15 }}>
 						<Text
 							style={{
@@ -234,12 +263,25 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<FlatList
-					data={displayedCoupons}
-					renderItem={couponItem}
-					keyExtractor={(item) => item.id}
-					horizontal={false}
-				/>
+				{coupons.length > 0 ? (
+					<FlatList
+						data={displayedCoupons}
+						renderItem={couponItem}
+						keyExtractor={(item) => item.id}
+						horizontal={false}
+						extraData={displayedCoupons.state}
+					/>
+				) : (
+					<Text
+						style={{
+							color: "white",
+							textAlign: "center",
+							fontSize: 20,
+						}}
+					>
+						No coupons available
+					</Text>
+				)}
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}

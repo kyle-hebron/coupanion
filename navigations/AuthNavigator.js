@@ -28,8 +28,6 @@ const Stack = createNativeStackNavigator()
 function AuthNavigator() {
 	const [isABusiness, setIsABusiness] = useState(false)
 
-	const isFocused = useIsFocused()
-
 	onAuthStateChanged(auth, (user) => {
 		if (user) {
 			checkBusiness()
