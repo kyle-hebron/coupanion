@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { useState, useEffect } from "react"
 
 import LoginScreen from "../screens/LoginScreen"
 import RegisterScreen from "../screens/RegisterScreen"
@@ -16,9 +17,12 @@ import BottomTabNavigatorUser from "./BottomTabNavigatorUser"
 
 import { isBusiness } from "../Helpers/dbHelper"
 
+import { auth } from "../firebase"
+
 const Stack = createNativeStackNavigator()
 
 function AuthNavigator() {
+	const [isABusiness, setIsABusiness] = useState(false)
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -43,34 +47,8 @@ function AuthNavigator() {
 				component={BusinessRegister}
 			/>
 			<Stack.Screen
-				name="Business"
-				component={BusinessPage}
-			/>
-			<Stack.Screen
-				name="Question"
-				component={Question}
-			/>
-			<Stack.Screen
-				name="Verify"
-				component={Verify}
-			/>
-			<Stack.Screen
-				name="ListScreen"
-				component={ListScreen}
-			/>
-			<Stack.Screen
-				name="SearchScreen"
-				component={SearchScreen}
-			/>
-			<Stack.Screen
-				name="CouponMaker"
-				component={CouponMaker}
-			/>
-			<Stack.Screen
 				name="SignedIn"
-				component={
-					isBusiness() ? BottomTabNavigatorUser : BottomTabNavigator
-				}
+				component={BottomTabNavigator}
 			/>
 		</Stack.Navigator>
 	)

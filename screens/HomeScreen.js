@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 import {
 	StyleSheet,
 	Text,
@@ -8,69 +8,77 @@ import {
 	SafeAreaView,
 	SafeAreaProvider,
 	TouchableOpacity,
-} from "react-native";
-import { db } from "../firebase";
+} from "react-native"
+import { db, auth } from "../firebase"
+import { isBusiness } from "../Helpers/dbHelper"
 
 function HomeScreen({ navigation }) {
-	const [trendingBusinesses, setTrendingBusinesses] = useState([]);
-	const [topRatedBusinesses, setTopRatedBusinesses] = useState([]);
+	const [trendingBusinesses, setTrendingBusinesses] = useState([])
+	const [topRatedBusinesses, setTopRatedBusinesses] = useState([])
 
 	useEffect(() => {
 		// Get trending businesses from Firestore .
 		const trendingBusinessesRef = db
 			.collection("Business people")
-			.where("trending", "==", true);
-		const unsubscribeTrending = trendingBusinessesRef.onSnapshot((snapshot) => {
-			const businesses = [];
-			snapshot.forEach((doc) => {
-				const data = doc.data();
-				businesses.push({
-					id: doc.id,
-					name: data.business,
-					tag: data.tag,
-					image: { uri: data.image },
-				});
-			});
-			setTrendingBusinesses(businesses);
-		});
+			.where("trending", "==", true)
+		const unsubscribeTrending = trendingBusinessesRef.onSnapshot(
+			(snapshot) => {
+				const businesses = []
+				snapshot.forEach((doc) => {
+					const data = doc.data()
+					businesses.push({
+						id: doc.id,
+						name: data.business,
+						tag: data.tag,
+						image: { uri: data.image },
+					})
+				})
+				setTrendingBusinesses(businesses)
+			}
+		)
 
 		// Get top rated businesses from Firestore .
 		const topRatedBusinessesRef = db
 			.collection("Business people")
-			.where("top rated", "==", true);
-		const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot((snapshot) => {
-			const businesses = [];
-			snapshot.forEach((doc) => {
-				const data = doc.data();
-				businesses.push({
-					id: doc.id,
-					name: data.business,
-					tag: data.tag,
-					image: { uri: data.image },
-				});
-			});
-			setTopRatedBusinesses(businesses);
-		});
+			.where("top rated", "==", true)
+		const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot(
+			(snapshot) => {
+				const businesses = []
+				snapshot.forEach((doc) => {
+					const data = doc.data()
+					businesses.push({
+						id: doc.id,
+						name: data.business,
+						tag: data.tag,
+						image: { uri: data.image },
+					})
+				})
+				setTopRatedBusinesses(businesses)
+			}
+		)
 
 		return () => {
-			unsubscribeTrending();
-			unsubscribeTopRated();
-		};
-	}, []);
+			unsubscribeTrending()
+			unsubscribeTopRated()
+		}
+	}, [])
 
 	const renderItem = ({ item }) => (
 		<TouchableOpacity
 			onPress={() => navigation.navigate("Business", { id: item.id })}
 		>
 			<View style={styles.item}>
-				<Image source={item.image} style={styles.logo} />
+				<Image
+					source={item.image}
+					style={styles.logo}
+				/>
 				<View style={styles.nameContainer}>
 					<Text style={styles.text}>{item.name}</Text>
 					<Text style={styles.tag}>{item.tag}</Text>
 				</View>
 			</View>
 		</TouchableOpacity>
-	);
+	)
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -94,7 +102,7 @@ function HomeScreen({ navigation }) {
 				/>
 			</View>
 		</SafeAreaView>
-	);
+	)
 }
 
 const styles = StyleSheet.create({
@@ -166,6 +174,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		marginBottom: 16,
 	},
-});
+})
 
-export default HomeScreen;
+export default HomeScreen

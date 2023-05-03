@@ -15,7 +15,13 @@ import {
 } from "react-native"
 import { useRoute } from "@react-navigation/native"
 import { Linking } from "react-native"
-import { collection, query, where, getDocs } from "firebase/firestore"
+import {
+	collection,
+	query,
+	where,
+	getDocs,
+	increment,
+} from "firebase/firestore"
 import { db } from "../firebase"
 import MapView, { Marker } from "react-native-maps"
 import locationiq from "react-native-locationiq"
@@ -127,18 +133,41 @@ export default function BusinessProfileScreen({ navigation }) {
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView>
-				<Text
+				<View
 					style={{
-						fontSize: 32,
-						textAlign: "left",
-						margin: 0,
-						fontWeight: "bold",
-						color: "white",
-						paddingLeft: 10,
+						flexDirection: "row",
+						justifyContent: "flex-start",
+						alignItems: "center",
 					}}
 				>
-					Profile
-				</Text>
+					<TouchableOpacity
+						onPress={() => {
+							navigation.goBack()
+						}}
+					>
+						<Icon
+							name="arrow-left"
+							size={30}
+							color="white"
+							style={{
+								marginLeft: 20,
+								marginTop: 0,
+							}}
+						/>
+					</TouchableOpacity>
+					<Text
+						style={{
+							fontSize: 32,
+							textAlign: "left",
+							margin: 0,
+							fontWeight: "bold",
+							color: "white",
+							paddingLeft: 10,
+						}}
+					>
+						Profile
+					</Text>
+				</View>
 				<View style={styles.balloon}>
 					<Image
 						source={pic}
@@ -198,9 +227,7 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
-					onPress={() => {
-						navigation.navigate("Verify")
-					}}
+					onPress={() => {}}
 				>
 					<Text
 						style={{

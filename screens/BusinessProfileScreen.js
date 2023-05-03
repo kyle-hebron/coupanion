@@ -12,6 +12,7 @@ import {
 	ScrollView,
 	Button,
 	GradientTextButton,
+	FlatList,
 } from "react-native"
 import { useRoute } from "@react-navigation/native"
 import { Linking } from "react-native"
@@ -20,12 +21,14 @@ import {
 	query,
 	where,
 	getDocs,
+	increment,
 	getDoc,
 	doc,
 } from "firebase/firestore"
-import { db, auth } from "../firebase"
+import { db, auth, storage } from "../firebase"
 import MapView, { Marker } from "react-native-maps"
 import locationiq from "react-native-locationiq"
+import { getDownloadURL, ref } from "firebase/storage"
 
 locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
 
@@ -37,11 +40,13 @@ export default function BusinessProfileScreen({ navigation }) {
 	const [zip, setZip] = useState(" ")
 	const [state, setState] = useState(" ")
 	const [pfp, setPfp] = useState(" ")
-	const [pic, setPic] = useState(" ")
+	const [profilePicture, setProfilePicture] = useState(" ")
 	const [countUp, setCountUp] = useState(0) // For rating .
 	const [countDown, setCountDown] = useState(0) // For rating .
 	const [selected, setSelected] = useState(null) // For rating .
 	const [coordinates, setCoordinates] = useState(null) // For map .
+	const [coupons, setCoupons] = useState({}) // For coupons .
+	const [displayedCoupons, setDisplayedCoupons] = useState({}) // For coupons .
 	const route = useRoute()
 	const id = route.params?.id
 
@@ -56,10 +61,11 @@ export default function BusinessProfileScreen({ navigation }) {
 						setNumber(docSnap.data().phone)
 						setZip(docSnap.data().AddressInfo.zip)
 						setState(docSnap.data().AddressInfo.state)
-						setPfp(docSnap.data().pfp)
 						setCountUp(docSnap.data().thumbUp)
 						setCountDown(docSnap.data().thumbDown)
-						setPic({ uri: docSnap.data().image })
+						setProfilePicture(
+							"images/" + docSnap.data().profilePicture
+						)
 					} else {
 						console.log("No such document!")
 					}
@@ -75,8 +81,77 @@ export default function BusinessProfileScreen({ navigation }) {
 				})
 				.catch((error) => console.warn(error))
 		}
+
 		fetchData()
+		getProfilePicture()
+		getCoupons()
+
+		// Make sure the profile picture is actually loaded otherwise an error will be thrown
 	}, [])
+
+	//Gets the coupon list from the database and then makes sure that we are only displaying the first two coupons
+	async function getCoupons() {
+		const docSnap = await getDoc(
+			doc(db, "Business people", auth.currentUser.uid)
+		)
+		setCoupons(docSnap.data().coupons)
+		// If there are enough coupons, get the first two and store them in displayedCoupons
+		if (Object.keys(coupons).length >= 2) {
+			const firstTwoCoupons = Object.keys(coupons).slice(0, 2)
+			setDisplayedCoupons(firstTwoCoupons)
+		} else {
+			setDisplayedCoupons(coupons)
+		}
+	}
+
+	async function getProfilePicture() {
+		await getDownloadURL(ref(storage, profilePicture)).then((url) => {
+			setProfilePicture(url)
+		})
+	}
+
+	const couponItem = ({ item }) => (
+		<View
+			style={{
+				flex: 1,
+				flexDirection: "row",
+				justifyContent: "space-around",
+				alignItems: "center",
+				backgroundColor: "#fff",
+				margin: 10,
+				padding: 20,
+				borderRadius: 10,
+			}}
+		>
+			<View
+				style={{
+					flex: 1,
+					flexDirection: "row",
+					justifyContent: "flex-start",
+					alignItems: "center",
+				}}
+			>
+				<Icon
+					style={{
+						paddingRight: 10,
+					}}
+					name="qrcode"
+					size={50}
+					color="#000"
+				/>
+				<Text
+					style={{
+						fontSize: 40,
+						textAlign: "center",
+						paddingRight: 10,
+					}}
+				>
+					{item.title}
+				</Text>
+			</View>
+			<Text>{item.expiration}</Text>
+		</View>
+	)
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -95,7 +170,7 @@ export default function BusinessProfileScreen({ navigation }) {
 				</Text>
 				<View style={styles.balloon}>
 					<Image
-						source={pic}
+						source={{ uri: profilePicture }}
 						style={styles.logo}
 					/>
 					<View style={{ paddingHorizontal: 15 }}>
@@ -125,30 +200,12 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={{ alignItems: "center" }}>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #1
-						</Text>
-					</View>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #2
-						</Text>
-					</View>
-				</View>
+				<FlatList
+					data={displayedCoupons}
+					renderItem={couponItem}
+					keyExtractor={(item) => item.id}
+					horizontal={false}
+				/>
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}

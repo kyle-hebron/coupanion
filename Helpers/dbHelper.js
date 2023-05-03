@@ -1,34 +1,42 @@
 import {
-	db,
-	auth,
 	getDoc,
 	doc,
 	query,
 	collection,
 	getDocs,
-} from "firebase/firestore";
+	where,
+} from "firebase/firestore"
+
+import { db } from "../firebase"
 
 //Search the database to see if there is a user with these credentials
-export const isBusiness = async (uid) => {
-	console.log("here");
-	const qB = query(collection(db, "Business people"), where("uid", "==", uid));
-	const qU = query(collection(db, "Business people"), where("uid", "==", uid));
-	const querySnapshotBusiness = await getDocs(qB);
-	const querySnapshotUser = await getDocs(qU);
+async function isBusiness(uid) {
+	if (uid) {
+		const qB = query(
+			collection(db, "Business people"),
+			where("uid", "==", uid)
+		)
+		const qU = query(collection(db, "Users"), where("uid", "==", uid))
+		const querySnapshotBusiness = await getDocs(qB)
+		const querySnapshotUser = await getDocs(qU)
 
-	querySnapshotBusiness.forEach((doc) => {
-		if (doc) {
-			console.log("There is a business with this UID");
-			return true;
-		}
-	});
+		var business = false
 
-	querySnapshotUser.forEach((doc) => {
-		if (doc) {
-			console.log("There is a user with this UID");
-			return false;
-		}
-	});
+		querySnapshotBusiness.forEach((doc) => {
+			if (doc) {
+				console.log("There is a business with this UID")
+				business = true
+			}
+		})
 
-	console.log("No user found with this UID");
-};
+		querySnapshotUser.forEach((doc) => {
+			if (doc) {
+				console.log("There is a user with this UID")
+				business = false
+			}
+		})
+		return business
+	}
+}
+
+export { isBusiness }

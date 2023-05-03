@@ -9,18 +9,18 @@ import { auth } from "./firebase"
 import BottomTabNavigatorUser from "./navigations/BottomTabNavigatorUser"
 
 import { isBusiness } from "./Helpers/dbHelper"
+import { onAuthStateChanged } from "firebase/auth"
 
 export default function App() {
 	//Checks if there is a user signed in or not
-
 	return (
 		//Checking for
 		<NavigationContainer>
 			{auth.currentUser ? (
-				isBusiness() ? (
-					<BottomTabNavigatorUser />
-				) : (
+				isBusiness(auth.currentUser.uid) ? (
 					<BottomTabNavigator />
+				) : (
+					<BottomTabNavigatorUser />
 				)
 			) : (
 				<AuthNavigator />

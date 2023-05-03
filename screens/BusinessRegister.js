@@ -107,7 +107,8 @@ export default function BusinessRegister({ navigation }) {
 						state: state,
 						zip: zip,
 					},
-					Coupons: {},
+					thumbUp: 0,
+					thumbDown: 0,
 				},
 				{ merge: true }
 			)

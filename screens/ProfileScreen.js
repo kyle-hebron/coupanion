@@ -36,9 +36,10 @@ Notifications.setNotificationHandler({
 	}),
 })
 
-export default function BusinessPage({ navigation }) {
+export default function ProfileScreen({ navigation }) {
 	const [username, setUsername] = useState("")
 	const [profilePicture, setProfilePicture] = useState("")
+	const [pfpUrl, setPfpUrl] = useState("")
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -54,11 +55,11 @@ export default function BusinessPage({ navigation }) {
 
 		fetchData()
 		// Make sure the profile picture is actually loaded otherwise an error will be thrown
-		if (profilePicture) {
+		if (!profilePicture.startsWith("images/")) {
 			const fileRef = ref(storage, profilePicture)
 			getDownloadURL(fileRef).then((url) => {
-				setProfilePicture(url)
-				console.log(url)
+				setPfpUrl(url)
+				console.log(pfpUrl)
 			})
 		}
 	}, [])
@@ -113,7 +114,7 @@ export default function BusinessPage({ navigation }) {
 				</View>
 				<View style={styles.balloon}>
 					<Image
-						source={{ uri: profilePicture }}
+						source={{ uri: pfpUrl }}
 						style={styles.logo}
 					/>
 

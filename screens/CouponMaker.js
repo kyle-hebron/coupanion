@@ -16,19 +16,18 @@ import DateTimePickerModal from "react-native-modal-datetime-picker"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Ionicons from "react-native-vector-icons/Ionicons"
 
-import { db } from "../firebase"
-import { getAuth, updateProfile } from "firebase/auth"
-import { doc, setDoc, getDoc } from "firebase/firestore"
+import { db, auth } from "../firebase"
+import { updateProfile } from "firebase/auth"
+import { doc, setDoc, getDoc, arrayUnion, updateDoc } from "firebase/firestore"
 
 const CouponMaker = ({ navigation }) => {
-	const auth = getAuth()
-	const user = auth.currentUser
-
 	const [titleText, setTitleText] = useState("")
 	const [codeText, setCodeText] = useState("")
 	const [discountText, setDiscountText] = useState("")
 	const [descriptionText, setDescription] = useState("")
 	const [expDate, setExpDate] = useState("Expiration")
+
+	const [coupons, setCoupons] = useState({})
 
 	const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
 
@@ -96,7 +95,7 @@ const CouponMaker = ({ navigation }) => {
 							keyboardType="numeric"
 							placeholder="Discount"
 							style={[styles.discount, styles.input]}
-							maxLength={3}
+							maxLength={2}
 							onChangeText={(newText) => setDiscountText(newText)}
 						/>
 
@@ -132,62 +131,47 @@ const CouponMaker = ({ navigation }) => {
 
 					<TouchableOpacity
 						onPress={async () => {
-							var currentCoupons
-							var coupons = {}
-							var error = false
-
 							try {
 								const docSnap = await getDoc(
-									doc(db, "Business people", user.uid)
+									doc(
+										db,
+										"Business people",
+										auth.currentUser.uid
+									)
 								)
-								console.log(docSnap.data())
-								currentCoupons = Object.keys(
-									docSnap.data()["Coupons"]
-								)
-								console.log(currentCoupons)
+								setCoupons(docSnap.data().coupons)
+								//Get all coupon codes from the database and see if the new code is already in use
+								for (let i = 0; i < coupons.length; i++) {
+									if (coupons[i].couponCode == codeText) {
+										errorAlert()
+										return
+									}
+								}
 							} catch (error) {
 								console.log(error)
 							}
 
-							coupons[codeText] = {
+							newCoupon = {
 								title: titleText,
 								description: descriptionText,
 								discount: discountText,
 								expiration: expDate,
 								couponCode: codeText,
 							}
-
-							for (var i = 0; i < currentCoupons.length; i++) {
-								if (currentCoupons[i] == codeText) {
-									error = true
-									errorAlert()
-									console.log("Error")
+							updateDoc(
+								doc(
+									db,
+									"Business people",
+									auth.currentUser.uid
+								),
+								{
+									coupons: arrayUnion(newCoupon),
 								}
-							}
-							if (!error) {
-								if (user) {
-									setDoc(
-										doc(db, "Business people", user.uid),
-										coupons,
-										{ merge: true }
-									)
-
-									alert("Coupon Created")
-								} else {
-									console.log("No Coupon Created")
-									setError("No Coupon Created")
-								}
-							}
+							)
 						}}
 						style={styles.button}
 					>
 						<Text styles={styles.buttonText}>Create</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => navigation.navigate("Verify")}
-						style={styles.button}
-					>
-						<Text styles={styles.buttonText}>Back</Text>
 					</TouchableOpacity>
 				</KeyboardAvoidingView>
 			</SafeAreaView>

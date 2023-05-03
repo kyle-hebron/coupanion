@@ -18,8 +18,8 @@ function BottomTabNavigator() {
 				tabBarIcon: ({ focused, color, size }) => {
 					let iconName
 
-					if (route.name === "Home") {
-						iconName = focused ? "home" : "home-outline"
+					if (route.name === "Verify") {
+						iconName = focused ? "checkmark" : "checkmark-outline"
 					} else if (route.name === "CouponMaker") {
 						iconName = focused ? "add-circle" : "add-circle-outline"
 					} else if (route.name === "Profile") {

@@ -7,7 +7,7 @@ import {
 	TouchableWithoutFeedbackBase,
 	Switch,
 } from "react-native"
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { ThemedButton } from "react-native-really-awesome-button"
 import { TextInput } from "react-native-element-textinput"
 import Icon from "react-native-vector-icons/FontAwesome"

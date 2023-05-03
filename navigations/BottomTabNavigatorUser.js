@@ -73,6 +73,10 @@ function BottomTabNavigatorUser() {
 				component={SettingScreen}
 			/>
 			<Stack.Screen
+				name="Business"
+				component={BusinessPage}
+			/>
+			<Stack.Screen
 				name="TabView"
 				component={TabView}
 			/>
