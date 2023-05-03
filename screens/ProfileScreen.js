@@ -46,7 +46,10 @@ export default function ProfileScreen({ navigation }) {
 			getDoc(doc(db, "users", auth.currentUser.uid)).then((docSnap) => {
 				if (docSnap.exists()) {
 					setUsername(docSnap.data().username)
-					setProfilePicture("images/" + docSnap.data().profilePicture)
+					setProfilePicture(
+						"gs://coupanion-96203.appspot.com/images/" +
+							docSnap.data().profilePicture
+					)
 				} else {
 					console.log("No such document!")
 				}
@@ -58,10 +61,19 @@ export default function ProfileScreen({ navigation }) {
 		getProfilePicture()
 	}, [])
 
+	useEffect(() => {
+		getProfilePicture()
+	}, [profilePicture])
+
 	async function getProfilePicture() {
-		await getDownloadURL(storage.ref(profilePicture)).then((url) => {
-			setPfpUrl(url)
-		})
+		if (profilePicture.startsWith("gs://")) {
+			await storage
+				.refFromURL(profilePicture)
+				.getDownloadURL()
+				.then((url) => {
+					setPfpUrl(url)
+				})
+		}
 	}
 
 	return (
@@ -113,10 +125,14 @@ export default function ProfileScreen({ navigation }) {
 					</TouchableOpacity>
 				</View>
 				<View style={styles.balloon}>
-					<Image
-						source={{ uri: pfpUrl }}
-						style={styles.logo}
-					/>
+					{pfpUrl.startsWith("https") ? (
+						<Image
+							source={{ uri: pfpUrl }}
+							style={styles.logo}
+						/>
+					) : (
+						<Text>Loading...</Text>
+					)}
 
 					<View style={{ paddingHorizontal: 15 }}>
 						<Text
