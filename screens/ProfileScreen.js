@@ -59,7 +59,7 @@ export default function ProfileScreen({ navigation }) {
 	}, [])
 
 	async function getProfilePicture() {
-		await getDownloadURL(ref(storage, profilePicture)).then((url) => {
+		await getDownloadURL(storage.ref(profilePicture)).then((url) => {
 			setPfpUrl(url)
 		})
 	}
