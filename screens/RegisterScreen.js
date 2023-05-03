@@ -155,6 +155,7 @@ export default function RegisterScreen({ route, navigation }) {
 				})
 				.catch((err) => setError(err.message))
 			onAuthStateChanged(auth, (user) => {
+				console.log(isBusiness)
 				if (user) {
 					setFilePath(
 						image.uri.substring(image.uri.lastIndexOf("/") + 1)

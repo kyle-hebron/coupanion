@@ -5,26 +5,19 @@ import { getData } from "./components/UserDefaults"
 import AuthNavigator from "./navigations/AuthNavigator"
 import BottomTabNavigator from "./navigations/BottomTabNavigator"
 
-import { auth } from "./firebase"
+import { auth, db } from "./firebase"
 import BottomTabNavigatorUser from "./navigations/BottomTabNavigatorUser"
 
 import { isBusiness } from "./Helpers/dbHelper"
 import { onAuthStateChanged } from "firebase/auth"
+import { useEffect, useState } from "react"
+import { getDoc, doc } from "firebase/firestore"
 
 export default function App() {
-	//Checks if there is a user signed in or not
 	return (
 		//Checking for
 		<NavigationContainer>
-			{auth.currentUser ? (
-				isBusiness(auth.currentUser.uid) ? (
-					<BottomTabNavigator />
-				) : (
-					<BottomTabNavigatorUser />
-				)
-			) : (
-				<AuthNavigator />
-			)}
+			<AuthNavigator />
 		</NavigationContainer>
 	)
 }

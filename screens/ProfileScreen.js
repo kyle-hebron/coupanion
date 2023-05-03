@@ -55,14 +55,14 @@ export default function ProfileScreen({ navigation }) {
 
 		fetchData()
 		// Make sure the profile picture is actually loaded otherwise an error will be thrown
-		if (!profilePicture.startsWith("images/")) {
-			const fileRef = ref(storage, profilePicture)
-			getDownloadURL(fileRef).then((url) => {
-				setPfpUrl(url)
-				console.log(pfpUrl)
-			})
-		}
+		getProfilePicture()
 	}, [])
+
+	async function getProfilePicture() {
+		await getDownloadURL(ref(storage, profilePicture)).then((url) => {
+			setPfpUrl(url)
+		})
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>

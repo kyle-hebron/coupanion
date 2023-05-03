@@ -7,36 +7,37 @@ import {
 	where,
 } from "firebase/firestore"
 
-import { db } from "../firebase"
+import { useState } from "react"
+import { db, auth } from "../firebase"
 
 //Search the database to see if there is a user with these credentials
-async function isBusiness(uid) {
-	if (uid) {
-		const qB = query(
-			collection(db, "Business people"),
-			where("uid", "==", uid)
+async function isBusiness() {
+	const [isABusiness, setIsABusiness] = useState(false)
+	if (auth.currentUser) {
+		console.log("Checking if user is a business" + auth.currentUser.uid)
+		//Get all businesses with uid
+		getDoc(doc(db, "users", auth.currentUser.uid)).then((docSnap) => {
+			if (docSnap.exists()) {
+				console.log("User found!")
+				setIsABusiness(false)
+			} else {
+				console.log("No user found!")
+			}
+		})
+
+		getDoc(doc(db, "Business people", auth.currentUser.uid)).then(
+			(docSnap) => {
+				if (docSnap.exists()) {
+					console.log("Business found!")
+					setIsABusiness(true)
+				} else {
+					console.log("No business found!")
+				}
+			}
 		)
-		const qU = query(collection(db, "Users"), where("uid", "==", uid))
-		const querySnapshotBusiness = await getDocs(qB)
-		const querySnapshotUser = await getDocs(qU)
-
-		var business = false
-
-		querySnapshotBusiness.forEach((doc) => {
-			if (doc) {
-				console.log("There is a business with this UID")
-				business = true
-			}
-		})
-
-		querySnapshotUser.forEach((doc) => {
-			if (doc) {
-				console.log("There is a user with this UID")
-				business = false
-			}
-		})
-		return business
 	}
+	console.log(isABusiness)
+	return isABusiness
 }
 
 export { isBusiness }

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
 	StyleSheet,
 	Text,
@@ -19,6 +19,8 @@ import Ionicons from "react-native-vector-icons/Ionicons"
 import { db, auth } from "../firebase"
 import { updateProfile } from "firebase/auth"
 import { doc, setDoc, getDoc, arrayUnion, updateDoc } from "firebase/firestore"
+
+import { isBusiness } from "../Helpers/dbHelper"
 
 const CouponMaker = ({ navigation }) => {
 	const [titleText, setTitleText] = useState("")
@@ -63,6 +65,12 @@ const CouponMaker = ({ navigation }) => {
 				style: "cancel",
 			},
 		])
+
+	useEffect(() => {
+		isBusiness().then((res) => {
+			console.log(res)
+		})
+	}, [])
 
 	return (
 		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>

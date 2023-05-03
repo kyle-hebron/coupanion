@@ -10,6 +10,7 @@ import SettingScreen from "../screens/SettingScreen"
 
 import { getBusiness } from "../components/UserDefaults"
 import LoginScreen from "../screens/LoginScreen"
+import Question from "../screens/Question"
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -72,6 +73,10 @@ function BottomTabNavigatorUser() {
 			<Stack.Screen
 				name="Settings"
 				component={SettingScreen}
+			/>
+			<Stack.Screen
+				name="Question"
+				component={Question}
 			/>
 			<Stack.Screen
 				name="Business"
