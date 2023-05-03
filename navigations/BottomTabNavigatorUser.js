@@ -3,12 +3,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 import HomeScreen from "../screens/HomeScreen"
-import BusinessPage from "../screens/BusinessPage"
+import BusinessProfileScreen from "../screens/BusinessProfileScreen"
 import SearchScreen from "../screens/SearchScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 import SettingScreen from "../screens/SettingScreen"
 
 import { getBusiness } from "../components/UserDefaults"
+import LoginScreen from "../screens/LoginScreen"
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -74,7 +75,11 @@ function BottomTabNavigatorUser() {
 			/>
 			<Stack.Screen
 				name="Business"
-				component={BusinessPage}
+				component={BusinessProfileScreen}
+			/>
+			<Stack.Screen
+				name="Login"
+				component={LoginScreen}
 			/>
 			<Stack.Screen
 				name="TabView"

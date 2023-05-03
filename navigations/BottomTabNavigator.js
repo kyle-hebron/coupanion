@@ -1,16 +1,21 @@
 import Ionicons from "react-native-vector-icons/Ionicons"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 
-import BusinessPage from "../screens/BusinessPage"
-import CouponMaker from "../screens/CouponMaker"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+
 import BusinessProfileScreen from "../screens/BusinessProfileScreen"
+import CouponMaker from "../screens/CouponMaker"
+import BusinessPage from "../screens/BusinessPage"
 import Verify from "../screens/Verify"
+import SettingScreen from "../screens/SettingScreen"
+import LoginScreen from "../screens/LoginScreen"
 
 import { getBusiness } from "../components/UserDefaults"
 
 const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator()
 
-function BottomTabNavigator() {
+function TabView() {
 	return (
 		<Tab.Navigator
 			screenOptions={({ route }) => ({
@@ -47,13 +52,41 @@ function BottomTabNavigator() {
 			/>
 			<Tab.Screen
 				name="Profile"
-				component={BusinessProfileScreen}
+				component={BusinessPage}
 			/>
 			<Tab.Screen
 				name="Verify"
 				component={Verify}
 			/>
 		</Tab.Navigator>
+	)
+}
+
+function BottomTabNavigator() {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerShown: false,
+			}}
+			initialRouteName="TabView"
+		>
+			<Stack.Screen
+				name="Settings"
+				component={SettingScreen}
+			/>
+			<Stack.Screen
+				name="Business"
+				component={BusinessProfileScreen}
+			/>
+			<Stack.Screen
+				name="Login"
+				component={LoginScreen}
+			/>
+			<Stack.Screen
+				name="TabView"
+				component={TabView}
+			/>
+		</Stack.Navigator>
 	)
 }
 

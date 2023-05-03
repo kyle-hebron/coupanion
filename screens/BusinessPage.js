@@ -12,6 +12,7 @@ import {
 	ScrollView,
 	Button,
 	GradientTextButton,
+	FlatList,
 } from "react-native"
 import { useRoute } from "@react-navigation/native"
 import { Linking } from "react-native"
@@ -21,140 +22,149 @@ import {
 	where,
 	getDocs,
 	increment,
+	getDoc,
+	doc,
 } from "firebase/firestore"
-import { db } from "../firebase"
+import { db, auth, storage } from "../firebase"
 import MapView, { Marker } from "react-native-maps"
 import locationiq from "react-native-locationiq"
+import { getDownloadURL, ref } from "firebase/storage"
 
 locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
 
 export default function BusinessProfileScreen({ navigation }) {
-	const [users, setUsers] = useState(" ")
+	const [username, setUsername] = useState(" ")
 	const [address, setAddress] = useState(" ")
 	const [city, setCity] = useState(" ")
 	const [number, setNumber] = useState(" ")
 	const [zip, setZip] = useState(" ")
 	const [state, setState] = useState(" ")
 	const [pfp, setPfp] = useState(" ")
-	const [pic, setPic] = useState(" ")
+	const [profilePicture, setProfilePicture] = useState(" ")
 	const [countUp, setCountUp] = useState(0) // For rating .
 	const [countDown, setCountDown] = useState(0) // For rating .
 	const [selected, setSelected] = useState(null) // For rating .
 	const [coordinates, setCoordinates] = useState(null) // For map .
+	const [coupons, setCoupons] = useState({}) // For coupons .
+	const [displayedCoupons, setDisplayedCoupons] = useState({}) // For coupons .
 	const route = useRoute()
 	const id = route.params?.id
 
 	useEffect(() => {
 		async function fetchData() {
-			const q = query(collection(db, "Business people"))
-			const querySnapshot = await getDocs(q)
-			const users = []
-			querySnapshot.forEach((doc) => {
-				if (doc.id === id) {
-					const business = doc.data().business
-					const address = doc.data().AddressInfo.address1
-					const city = doc.data().AddressInfo.city
-					const number = doc.data().phone
-					const zip = doc.data().AddressInfo.zip
-					const state = doc.data().AddressInfo.state
-					const pfp = doc.data().pfp
-					const countUp = doc.data().thumbUp
-					const countDown = doc.data().thumbDown
-					const pic = { uri: doc.data().image }
-
-					setUsers(business)
-					setAddress(address)
-					setCity(city)
-					setNumber(number)
-					setZip(zip)
-					setState(state)
-					setPfp(pfp)
-					setCountUp(countUp)
-					setCountDown(countDown)
-					setPic(pic)
-
-					// Call LocationIQ API to convert address to coordinates .
-					locationiq
-						.search(`${address}, ${city}, ${state} ${zip}`)
-						.then((response) => {
-							const { lat, lon } = response[0]
-							setCoordinates({ latitude: lat, longitude: lon })
-						})
-						.catch((error) => console.warn(error))
+			getDoc(doc(db, "Business people", auth.currentUser.uid)).then(
+				(docSnap) => {
+					if (docSnap.exists()) {
+						setUsername(docSnap.data().username)
+						setAddress(docSnap.data().AddressInfo.address1)
+						setCity(docSnap.data().AddressInfo.city)
+						setNumber(docSnap.data().phone)
+						setZip(docSnap.data().AddressInfo.zip)
+						setState(docSnap.data().AddressInfo.state)
+						setCountUp(docSnap.data().thumbUp)
+						setCountDown(docSnap.data().thumbDown)
+						setProfilePicture(
+							"images/" + docSnap.data().profilePicture
+						)
+					} else {
+						console.log("No such document!")
+					}
 				}
-			})
+			)
+
+			// Call LocationIQ API to convert address to coordinates .
+			locationiq
+				.search(`${address}, ${city}, ${state} ${zip}`)
+				.then((response) => {
+					const { lat, lon } = response[0]
+					setCoordinates({ latitude: lat, longitude: lon })
+				})
+				.catch((error) => console.warn(error))
 		}
+
 		fetchData()
+		getProfilePicture()
+		getCoupons()
+
+		// Make sure the profile picture is actually loaded otherwise an error will be thrown
 	}, [])
 
-	// A function to handle upvotes and downvotes , and to update the count of each accordingly .
-	const handleVote = (type) => {
-		if (type === selected) {
-			setSelected(null)
-			if (type === "up") {
-				setCountUp(countUp - 1)
-				db.collection("Business people")
-					.doc(id)
-					.update({ thumbUp: increment(-1) })
-			} else {
-				setCountDown(countDown - 1)
-				db.collection("Business people")
-					.doc(id)
-					.update({ thumbDown: increment(-1) })
-			}
+	//Gets the coupon list from the database and then makes sure that we are only displaying the first two coupons
+	async function getCoupons() {
+		const docSnap = await getDoc(
+			doc(db, "Business people", auth.currentUser.uid)
+		)
+		setCoupons(docSnap.data().coupons)
+		// If there are enough coupons, get the first two and store them in displayedCoupons
+		if (Object.keys(coupons).length >= 2) {
+			const firstTwoCoupons = [coupons[0], coupons[1]]
+			setDisplayedCoupons(firstTwoCoupons)
 		} else {
-			setSelected(type)
-			if (type === "up") {
-				setCountUp(countUp + 1)
-				db.collection("Business people")
-					.doc(id)
-					.update({ thumbUp: increment(1) })
-				if (selected === "down") {
-					setCountDown(countDown - 1)
-					db.collection("Business people")
-						.doc(id)
-						.update({ thumbDown: increment(-1) })
-				}
-			} else {
-				setCountDown(countDown + 1)
-				db.collection("Business people")
-					.doc(id)
-					.update({ thumbDown: increment(1) })
-				if (selected === "up") {
-					setCountUp(countUp - 1)
-					db.collection("Business people")
-						.doc(id)
-						.update({ thumbUp: increment(-1) })
-				}
-			}
+			setDisplayedCoupons(coupons)
 		}
 	}
+
+	async function getProfilePicture() {
+		await getDownloadURL(ref(storage, profilePicture)).then((url) => {
+			setProfilePicture(url)
+		})
+	}
+
+	const couponItem = ({ item }) => (
+		<View
+			style={{
+				flex: 1,
+				flexDirection: "row",
+				justifyContent: "space-around",
+				alignItems: "center",
+				backgroundColor: "#fff",
+				margin: 10,
+				padding: 20,
+				borderRadius: 10,
+			}}
+		>
+			<View
+				style={{
+					flex: 1,
+					flexDirection: "row",
+					justifyContent: "flex-start",
+					alignItems: "center",
+				}}
+			>
+				<Icon
+					style={{
+						paddingRight: 10,
+					}}
+					name="qrcode"
+					size={50}
+					color="#000"
+				/>
+				<Text
+					style={{
+						fontSize: 40,
+						textAlign: "center",
+						paddingRight: 10,
+					}}
+				>
+					{item.title}
+				</Text>
+			</View>
+			<Text>{item.expiration}</Text>
+		</View>
+	)
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView>
 				<View
 					style={{
+						flex: 1,
 						flexDirection: "row",
-						justifyContent: "flex-start",
+						justifyContent: "space-between",
 						alignItems: "center",
+						padding: 10,
 					}}
 				>
-					<TouchableOpacity
-						onPress={() => {
-							navigation.goBack()
-						}}
-					>
-						<Icon
-							name="arrow-left"
-							size={30}
-							color="white"
-							style={{
-								marginLeft: 20,
-								marginTop: 0,
-							}}
-						/>
-					</TouchableOpacity>
 					<Text
 						style={{
 							fontSize: 32,
@@ -167,10 +177,34 @@ export default function BusinessProfileScreen({ navigation }) {
 					>
 						Profile
 					</Text>
+					<TouchableOpacity
+						style={{
+							marginLeft: 15,
+							backgroundColor: "white",
+							width: 40,
+							height: 40,
+							borderRadius: 10,
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+						onPress={() => {
+							navigation.push("Settings")
+						}}
+					>
+						<Icon
+							style={{
+								fontSize: 25,
+								color: "black",
+								marginRight: 0,
+								padding: 0,
+							}}
+							name="cog"
+						/>
+					</TouchableOpacity>
 				</View>
 				<View style={styles.balloon}>
 					<Image
-						source={pic}
+						source={{ uri: profilePicture }}
 						style={styles.logo}
 					/>
 					<View style={{ paddingHorizontal: 15 }}>
@@ -181,7 +215,7 @@ export default function BusinessProfileScreen({ navigation }) {
 								fontWeight: "bold",
 							}}
 						>
-							{users}
+							{username}
 						</Text>
 						<Text style={styles.name}>{address}</Text>
 						<Text style={styles.name}>
@@ -200,34 +234,18 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={{ alignItems: "center" }}>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #1
-						</Text>
-					</View>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #2
-						</Text>
-					</View>
-				</View>
+				<FlatList
+					data={displayedCoupons}
+					renderItem={couponItem}
+					keyExtractor={(item) => item.id}
+					horizontal={false}
+				/>
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
-					onPress={() => {}}
+					onPress={() => {
+						navigation.navigate("Verify")
+					}}
 				>
 					<Text
 						style={{
@@ -330,7 +348,7 @@ export default function BusinessProfileScreen({ navigation }) {
 				<Text style={styles.titles}>Rating and Reviews</Text>
 
 				<View style={styles.rating}>
-					<TouchableOpacity onPress={() => handleVote("up")}>
+					<TouchableOpacity>
 						<Icon
 							name="thumbs-up"
 							size={35}
@@ -338,7 +356,7 @@ export default function BusinessProfileScreen({ navigation }) {
 						/>
 					</TouchableOpacity>
 					<Text style={styles.count}>{countUp}</Text>
-					<TouchableOpacity onPress={() => handleVote("down")}>
+					<TouchableOpacity>
 						<Icon
 							name="thumbs-down"
 							size={35}
