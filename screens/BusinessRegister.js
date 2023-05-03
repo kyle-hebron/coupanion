@@ -50,6 +50,7 @@ export default function BusinessRegister({navigation}){
     
     function signAddress(address1, address2, city, state, zip){
         if(user){
+            var temp = user.uid;
                 setDoc(doc(db, "Business people", user.uid),{
                     AddressInfo: {
                         address1: address1,
@@ -61,7 +62,7 @@ export default function BusinessRegister({navigation}){
 
                 }, {merge: true});
 
-                navigation.navigate("SignedIn");
+                navigation.navigate("QuestionBusiness", {id: temp});
 
 
             } else {

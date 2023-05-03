@@ -9,13 +9,11 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	Animated,
-	
 } from "react-native";
 import MultiSelect from "react-native-multiple-select";
-
+import { useRoute } from "@react-navigation/native";
 import GradientTextButton from "../components/GradientTextButton";
 import IconInput from "../components/IconInput";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { db } from '../firebase'
 import { getAuth, updateProfile } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -165,7 +163,7 @@ const FadeInView = (props) => {
 	);
 };
 
-class Question extends Component {
+class QuestionBusiness extends Component {
 	
 	state = {
 		value: 25,
@@ -190,6 +188,7 @@ class Question extends Component {
 	handleNextButtonPress = () => {
 		const { clothingItems, foodItems, entItems } = this.state;
 		const { id } = this.props.route.params;
+		
 		const selectedItems = [
 			...clothingItems.map((itemId) => {
 				const item = clothingItemsList.find((item) => item.id === itemId);
@@ -205,17 +204,19 @@ class Question extends Component {
 			  }),
 			];
 		  
-			// Filter out any null values
+			
 			const filteredItems = selectedItems.filter((item) => item !== null);
 		  
-			// Do whatever you need to do with the filtered items array
+			const auth = getAuth();
+		    const user = auth.currentUser;
+		    const userID = user.uid;
 			console.log(filteredItems);
-			db.collection("users")
+			db.collection("Business people")
     		.doc(id)
     		.update({ tags: filteredItems })
     		.then(() => {
       		console.log("Selected items stored in Firestore successfully!");
-			this.props.navigation.navigate('SignedIn');
+            this.props.navigation.navigate('SignedIn');
     		})
     		.catch((error) => {
       		console.error("Error storing selected items in Firestore: ", error);
@@ -243,6 +244,17 @@ class Question extends Component {
 								}}
 							>
 								Welcome to Coupanion
+							</Text>
+                            <Text
+								style={{
+									fontSize: 20,
+									textAlign: "center",
+									margin: 10,
+									fontWeight: "bold",
+									color: "#FFFFFF"
+								}}
+							>
+								Please enter the tags for your business.
 							</Text>
 						</FadeInView>
 					</View>
@@ -329,7 +341,7 @@ class Question extends Component {
 										/>
 									</View>
 
-									
+									<Text />
 									
 									<TouchableOpacity onPress={() => {this.handleNextButtonPress()}}>
 										<GradientTextButton text="Next" styles={styles} />
@@ -418,4 +430,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default Question;
+export default QuestionBusiness;

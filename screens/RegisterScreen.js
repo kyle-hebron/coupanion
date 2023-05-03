@@ -143,13 +143,14 @@ export default function RegisterScreen({ route, navigation }) {
 						storeData("@isBusiness", "true");
 						navigation.navigate("BusinessRegister");
 					} else {
-						setDoc(doc(db, "users", user.uid), {
-							uid: user.uid,
+						var va = user.uid;
+						setDoc(doc(db, "users", va), {
+							uid: va,
 							username: username,
 							email: email,
 						});
 						storeData("@isBusiness", "false");
-						navigation.navigate("Question");
+						navigation.navigate("Question", {id: va});
 					}
 				} else {
 					//console.log("No user logged in")
