@@ -25,7 +25,7 @@ function BottomTabNavigatorUser() {
 					} else if (route.name === "Search") {
 						iconName = focused ? "search-outline" : "search";
 					}
-
+						
 					return <Ionicons name={iconName} size={size} color={color} />;
 				},
 				tabBarActiveTintColor: "black",
