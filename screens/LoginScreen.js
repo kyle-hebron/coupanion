@@ -41,10 +41,12 @@ function LoginScreen({ navigation }) {
 				console.log("here");
 				if (isBusiness(auth.currentUser.uid)) {
 					storeData("@isBusiness", "true");
+					navigation.navigate("Profile", {id: auth.currentUser.uid});
 				} else {
 					storeData("@isBusiness", "false");
+					navigation.navigate("SignedIn");
 				}
-				navigation.navigate("SignedIn");
+				
 			})
 			.catch((error) => {
 				const errorCode = error.code;
