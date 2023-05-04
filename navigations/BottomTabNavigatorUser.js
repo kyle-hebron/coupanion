@@ -11,6 +11,7 @@ import SettingScreen from "../screens/SettingScreen"
 import { getBusiness } from "../components/UserDefaults"
 import LoginScreen from "../screens/LoginScreen"
 import Question from "../screens/Question"
+import ViewCoupons from "../screens/ViewCoupons"
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -89,6 +90,10 @@ function BottomTabNavigatorUser() {
 			<Stack.Screen
 				name="TabView"
 				component={TabView}
+			/>
+			<Stack.Screen
+				name="ViewCoupons"
+				component={ViewCoupons}
 			/>
 		</Stack.Navigator>
 	)

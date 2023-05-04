@@ -147,49 +147,7 @@ export default function ProfileScreen({ navigation }) {
 					</View>
 				</View>
 
-				<Text style={styles.titles}>Recently used</Text>
-
-				<View style={{ alignItems: "center" }}>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #1
-						</Text>
-					</View>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #2
-						</Text>
-					</View>
-				</View>
-
-				<TouchableOpacity
-					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
-					onPress={() => {
-						alert("No other coupons available")
-					}}
-				>
-					<Text
-						style={{
-							fontSize: 15,
-							color: "white",
-							paddingHorizontal: 25,
-						}}
-					>
-						View all
-					</Text>
-				</TouchableOpacity>
+				<Text style={styles.titles}>Other Info</Text>
 			</ScrollView>
 		</SafeAreaView>
 	)

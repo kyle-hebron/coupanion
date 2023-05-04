@@ -11,7 +11,6 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	Button,
-	GradientTextButton,
 } from "react-native"
 import { useRoute } from "@react-navigation/native"
 import { Linking } from "react-native"
@@ -25,6 +24,7 @@ import {
 import { db } from "../firebase"
 import MapView, { Marker } from "react-native-maps"
 import locationiq from "react-native-locationiq"
+import GradientTextButton from "../components/GradientTextButton"
 
 locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
 
@@ -200,44 +200,11 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={{ alignItems: "center" }}>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #1
-						</Text>
-					</View>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #2
-						</Text>
-					</View>
-				</View>
-
-				<TouchableOpacity
-					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
-					onPress={() => {}}
-				>
-					<Text
-						style={{
-							fontSize: 15,
-							color: "white",
-							paddingHorizontal: 25,
-						}}
-					>
-						View all
-					</Text>
+				<TouchableOpacity onPress={() => navigation.navigate("ViewCoupons", { id: id })}>
+					<GradientTextButton
+						text="View Coupons"
+						styles={styles}
+					/>
 				</TouchableOpacity>
 
 				<View style={{ flexDirection: "column", marginBottom: 10 }}>
@@ -286,26 +253,7 @@ export default function BusinessProfileScreen({ navigation }) {
 					</MapView>
 				</View>
 
-				<View style={{ flexDirection: "row", marginTop: 50 }}>
-					<View style={styles.balloonWhite}>
-						<TouchableOpacity
-							style={styles.buttonGroup}
-							onPress={() => {
-								alert("Menu not yet available")
-							}}
-						>
-							<Text
-								style={{
-									fontSize: 36,
-									textAlign: "center",
-									color: "#102C54",
-									fontWeight: "bold",
-								}}
-							>
-								Menu
-							</Text>
-						</TouchableOpacity>
-					</View>
+				<View style={{ flexDirection: "row", marginTop: 50, justifyContent: "center" }}>
 					<View style={styles.balloonWhite}>
 						<TouchableOpacity
 							style={styles.buttonGroup}
@@ -327,7 +275,7 @@ export default function BusinessProfileScreen({ navigation }) {
 					</View>
 				</View>
 
-				<Text style={styles.titles}>Rating and Reviews</Text>
+				<Text style={styles.titles}>Rating</Text>
 
 				<View style={styles.rating}>
 					<TouchableOpacity onPress={() => handleVote("up")}>
@@ -347,79 +295,6 @@ export default function BusinessProfileScreen({ navigation }) {
 					</TouchableOpacity>
 					<Text style={styles.count}>{countDown}</Text>
 				</View>
-
-				<View style={{ marginTop: 15, alignItems: "center" }}>
-					<View style={styles.balloonBackground}>
-						<View style={{ flexDirection: "row" }}>
-							<Text style={styles.reviewName}>Kristen</Text>
-							<Text style={styles.reviewName}> - </Text>
-							<Text style={styles.reviewName}>2 weeks ago</Text>
-						</View>
-						<Text style={styles.reviewText}>
-							I wish I could give it zero stars. The front
-							register girl was probably brand new but she spoke
-							at a whisper even after asking her 3 times to repeat
-							herself. We showed patience and grace, even after
-							being told they had no lettuce and finding their
-							drink machine was out of almost every drink and the
-							poor young gentleman behind the counter had to
-							assist with my drink because the girl from before
-							just didn't understand that the drinks were all out.
-							We went to use the women's restroom before we left
-							but the smell of sewer made us nearly vomit. We got
-							out to the car only to discover my mothers burger
-							was made wrong(literally had meat and a tomatoe
-							since they were out of lettuce). I am extremely
-							upset with this whole experience. The young guy
-							behind the counter is the only person I can give
-							props to. After we returned to get the burger
-							exchanged, he was the one I saw servicing the drink
-							machine. He was the one that spoke up and helped us.
-							Everyone else seemed clueless or just wanted to
-							stand behind the counter and watch what was
-							happening.{" "}
-						</Text>
-					</View>
-
-					<View style={styles.balloonBackground}>
-						<View style={{ flexDirection: "row" }}>
-							<Text style={styles.reviewName}>Brian Riggers</Text>
-							<Text style={styles.reviewName}> - </Text>
-							<Text style={styles.reviewName}>2 years ago</Text>
-						</View>
-						<Text style={styles.reviewText}>
-							Was standing in the lobby At 9:15 a.m.15 minutes
-							prior to official opening of doors. Could not take
-							my order for some reason. But tells me I can go
-							through the drive-through.Apparently it was a more
-							of a hassle for them to take my order in the lobby
-							Then it would for me to get back in my Big a** truck
-							and try to squeeze it through the drive-through.
-							Took my business somewhere else. Its mazing how we
-							provide business to places but the employees don't
-							wanna take that little extra Effort And still wanna
-							get paid $15 an hour.{" "}
-						</Text>
-					</View>
-				</View>
-
-				<TouchableOpacity
-					style={{ flexDirection: "row-reverse" }}
-					onPress={() => {
-						alert("No other reviews")
-					}}
-				>
-					<Text
-						style={{
-							fontSize: 15,
-							color: "white",
-							paddingHorizontal: 25,
-							marginBottom: 10,
-						}}
-					>
-						View all
-					</Text>
-				</TouchableOpacity>
 			</ScrollView>
 		</SafeAreaView>
 	)
