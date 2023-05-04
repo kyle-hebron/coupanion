@@ -12,6 +12,7 @@ import { ThemedButton } from "react-native-really-awesome-button"
 import { TextInput } from "react-native-element-textinput"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { auth, db } from "../firebase"
+import { signOut } from "firebase/auth"
 
 const SettingScreen = ({ navigation }) => {
 	const [isEnabled, setIsEnabled] = React.useState(false)

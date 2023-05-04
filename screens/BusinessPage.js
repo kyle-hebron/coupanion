@@ -30,7 +30,7 @@ import MapView, { Marker } from "react-native-maps"
 import locationiq from "react-native-locationiq"
 import { getDownloadURL, ref } from "firebase/storage"
 
-locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
+locationiq.init("pk.ccaa34a1c14b7281d60c55ea15ce4086") // Paste the LocationIQ access token here when running .
 
 export default function BusinessProfileScreen({ navigation }) {
 	const [username, setUsername] = useState("")
@@ -49,12 +49,6 @@ export default function BusinessProfileScreen({ navigation }) {
 	const [displayedCoupons, setDisplayedCoupons] = useState({}) // For coupons .
 	const route = useRoute()
 	const id = route.params?.id
-
-	useEffect(() => {
-		console.log("PROFILEPIC GBEGG" + profilePicture)
-		fetchData()
-		// Make sure the profile picture is actually loaded otherwise an error will be thrown
-	}, [])
 
 	async function fetchData() {
 		getDoc(doc(db, "Business people", auth.currentUser.uid)).then(
@@ -83,7 +77,7 @@ export default function BusinessProfileScreen({ navigation }) {
 						console.log("Getting profile picture")
 						getProfilePicture()
 					}
-					if (coupons) {
+					if (typeof coupons !== "undefined") {
 						getCoupons()
 					}
 				} else {
@@ -102,14 +96,44 @@ export default function BusinessProfileScreen({ navigation }) {
 			.catch((error) => console.warn(error))
 	}
 
+	useEffect(() => {
+		fetchData()
+		// Make sure the profile picture is actually loaded otherwise an error will be thrown
+	}, [])
+
+	useEffect(() => {
+		getCoordinates()
+	}, [coordinates])
+
+	function getCoordinates() {
+		setCoordinates(coordinates)
+	}
+
+	function getNewCoupons() {
+		getDoc(doc(db, "Business people", auth.currentUser.uid)).then(
+			(docSnap) => {
+				if (docSnap.exists()) {
+					setCoupons(docSnap.data().coupons)
+					if (typeof coupons !== "undefined") {
+						getCoupons()
+					}
+				} else {
+					console.log("No such document!")
+				}
+			}
+		)
+	}
+
 	//Gets the coupon list from the database and then makes sure that we are only displaying the first two coupons
 	function getCoupons() {
 		// If there are enough coupons, get the first two and store them in displayedCoupons
-		if (Object.keys(coupons).length >= 2) {
-			const firstTwoCoupons = [coupons[0], coupons[1]]
-			setDisplayedCoupons(firstTwoCoupons)
-		} else {
-			setDisplayedCoupons(coupons)
+		if (typeof coupons !== "undefined") {
+			if (Object.keys(coupons).length >= 2) {
+				const firstTwoCoupons = [coupons[0], coupons[1]]
+				setDisplayedCoupons(firstTwoCoupons)
+			} else {
+				setDisplayedCoupons(coupons)
+			}
 		}
 	}
 
@@ -261,9 +285,43 @@ export default function BusinessProfileScreen({ navigation }) {
 					</View>
 				</View>
 
-				<Text style={styles.titles}>Active Coupons</Text>
+				<View
+					style={{
+						flex: 1,
+						flexDirection: "row",
+						justifyContent: "space-between",
+						alignItems: "center",
+						padding: 10,
+					}}
+				>
+					<Text style={styles.titles}>Active Coupons</Text>
+					<TouchableOpacity
+						style={{
+							marginLeft: 15,
+							backgroundColor: "white",
+							width: 40,
+							height: 40,
+							borderRadius: 10,
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+						onPress={() => {
+							getNewCoupons()
+						}}
+					>
+						<Icon
+							style={{
+								fontSize: 25,
+								color: "black",
+								marginRight: 0,
+								padding: 0,
+							}}
+							name="redo"
+						/>
+					</TouchableOpacity>
+				</View>
 
-				{coupons.length > 0 ? (
+				{coupons ? (
 					<FlatList
 						data={displayedCoupons}
 						renderItem={couponItem}
@@ -286,7 +344,9 @@ export default function BusinessProfileScreen({ navigation }) {
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
 					onPress={() => {
-						navigation.navigate("Verify")
+						navigation.navigate("ViewCoupons", {
+							id: auth.currentUser.uid,
+						})
 					}}
 				>
 					<Text
@@ -339,12 +399,24 @@ export default function BusinessProfileScreen({ navigation }) {
 					</View>
 				</View>
 
-				<Text style={styles.titles}>Find us</Text>
-				<View style={{ flex: 1, height: 250 }}>
-					<MapView style={styles.map}>
-						{coordinates && <Marker coordinate={coordinates} />}
-					</MapView>
-				</View>
+				{coordinates !== null && (
+					<View>
+						<Text style={styles.titles}>Find us</Text>
+						<View style={{ flex: 1, height: 250 }}>
+							<MapView
+								style={styles.map}
+								initialRegion={{
+									latitude: coordinates.latitude,
+									longitude: coordinates.longitude,
+									latitudeDelta: 0.0922,
+									longitudeDelta: 0.0421,
+								}}
+							>
+								<Marker coordinate={coordinates} />
+							</MapView>
+						</View>
+					</View>
+				)}
 
 				<View style={{ flexDirection: "row", marginTop: 50 }}>
 					<View style={styles.balloonWhite}>

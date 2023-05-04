@@ -7,6 +7,7 @@ import BusinessProfileScreen from "../screens/BusinessProfileScreen"
 import SearchScreen from "../screens/SearchScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 import SettingScreen from "../screens/SettingScreen"
+import ViewCoupons from "../screens/ViewCoupons"
 
 import { getBusiness } from "../components/UserDefaults"
 import LoginScreen from "../screens/LoginScreen"
@@ -73,6 +74,11 @@ function BottomTabNavigatorUser() {
 			<Stack.Screen
 				name="Settings"
 				component={SettingScreen}
+			/>
+
+			<Stack.Screen
+				name="ViewCoupons"
+				component={ViewCoupons}
 			/>
 			<Stack.Screen
 				name="Question"

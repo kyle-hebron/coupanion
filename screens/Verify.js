@@ -25,26 +25,43 @@ export default function Verify({ navigation }) {
 	const auth = getAuth()
 	const user = auth.currentUser
 	const userID = user.uid
-	const [codes, setCode] = useState(" ")
+	const [codes, setCodes] = useState({})
+	const [code, setCode] = useState(" ")
 
 	const [coupons, setCoupons] = useState([])
 	const [discoun, setDiscount] = useState(" ")
 
+	async function fetchData() {
+		const q = query(collection(db, "Business people"))
+		const querySnapshot = await getDocs(q)
+		const users = []
+		querySnapshot.forEach((doc) => {
+			if (doc.id == auth.currentUser.uid) setCoupons(doc.data().coupons)
+		})
+	}
 	useEffect(() => {
-		async function fetchData() {
-			const q = query(collection(db, "Business people"))
-			const querySnapshot = await getDocs(q)
-			const users = []
-			querySnapshot.forEach((doc) => {
-				if (doc.id == userID) setCoupons(doc.data()["Coupons"])
-			})
-		}
 		fetchData()
 	}, [])
-	function setTrue() {
-		if (coupons[codes] != undefined) {
-			var temp = coupons[codes].description
-			Alert.alert("Success!", temp)
+
+	useEffect(() => {
+		fetchData()
+		//If we have any coupons, extract the codes
+		if (coupons) {
+			extractCodes()
+		}
+	}, [coupons])
+
+	function extractCodes() {
+		var temp = []
+		for (var i = 0; i < coupons.length; i++) {
+			temp.push(coupons[i].couponCode)
+		}
+		setCodes(temp)
+	}
+
+	function checkCode() {
+		if (codes.includes(code)) {
+			Alert.alert("Success!", "Coupon is valid")
 		} else {
 			Alert.alert("Fail", "Incorrect code")
 		}
@@ -57,7 +74,7 @@ export default function Verify({ navigation }) {
 				text="Code"
 				handleChange={setCode}
 			/>
-			<TouchableOpacity onPress={() => setTrue()}>
+			<TouchableOpacity onPress={() => checkCode()}>
 				<GradientTextButton
 					text="Confirm"
 					style={styles.buttonGroup}

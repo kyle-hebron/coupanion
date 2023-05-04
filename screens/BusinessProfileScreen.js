@@ -21,71 +21,171 @@ import {
 	where,
 	getDocs,
 	increment,
+	doc,
+	getDoc,
 } from "firebase/firestore"
-import { db } from "../firebase"
+import { db, auth, storage } from "../firebase"
 import MapView, { Marker } from "react-native-maps"
 import locationiq from "react-native-locationiq"
+import { FlatList } from "react-native"
 
-locationiq.init("LocationIQ_Acess_Token") // Paste the LocationIQ access token here when running .
+import { getDownloadURL, ref } from "firebase/storage"
+
+locationiq.init("pk.ccaa34a1c14b7281d60c55ea15ce4086") // Paste the LocationIQ access token here when running .
 
 export default function BusinessProfileScreen({ navigation }) {
 	const [users, setUsers] = useState(" ")
+	const [username, setUsername] = useState(" ")
 	const [address, setAddress] = useState(" ")
 	const [city, setCity] = useState(" ")
 	const [number, setNumber] = useState(" ")
 	const [zip, setZip] = useState(" ")
 	const [state, setState] = useState(" ")
 	const [pfp, setPfp] = useState(" ")
-	const [pic, setPic] = useState(" ")
+	const [profilePicture, setProfilePicture] = useState("")
 	const [countUp, setCountUp] = useState(0) // For rating .
 	const [countDown, setCountDown] = useState(0) // For rating .
 	const [selected, setSelected] = useState(null) // For rating .
 	const [coordinates, setCoordinates] = useState(null) // For map .
+	const [coupons, setCoupons] = useState({}) // For coupons .
+	const [displayedCoupons, setDisplayedCoupons] = useState([]) // For coupons .
 	const route = useRoute()
 	const id = route.params?.id
 
-	useEffect(() => {
-		async function fetchData() {
-			const q = query(collection(db, "Business people"))
-			const querySnapshot = await getDocs(q)
-			const users = []
-			querySnapshot.forEach((doc) => {
-				if (doc.id === id) {
-					const business = doc.data().business
-					const address = doc.data().AddressInfo.address1
-					const city = doc.data().AddressInfo.city
-					const number = doc.data().phone
-					const zip = doc.data().AddressInfo.zip
-					const state = doc.data().AddressInfo.state
-					const pfp = doc.data().pfp
-					const countUp = doc.data().thumbUp
-					const countDown = doc.data().thumbDown
-					const pic = { uri: doc.data().image }
-
-					setUsers(business)
-					setAddress(address)
-					setCity(city)
-					setNumber(number)
-					setZip(zip)
-					setState(state)
-					setPfp(pfp)
-					setCountUp(countUp)
-					setCountDown(countDown)
-					setPic(pic)
-
-					// Call LocationIQ API to convert address to coordinates .
-					locationiq
-						.search(`${address}, ${city}, ${state} ${zip}`)
-						.then((response) => {
-							const { lat, lon } = response[0]
-							setCoordinates({ latitude: lat, longitude: lon })
-						})
-						.catch((error) => console.warn(error))
+	async function fetchData() {
+		console.log("Loading" + id)
+		getDoc(doc(db, "Business people", id)).then((docSnap) => {
+			if (docSnap.id === id) {
+				setUsername(docSnap.data().username)
+				setAddress(docSnap.data().AddressInfo.address1)
+				setCity(docSnap.data().AddressInfo.city)
+				setNumber(docSnap.data().phone)
+				setZip(docSnap.data().AddressInfo.zip)
+				setState(docSnap.data().AddressInfo.state)
+				setCountUp(docSnap.data().thumbUp)
+				setCountDown(docSnap.data().thumbDown)
+				if (!profilePicture.length > 0) {
+					setProfilePicture(
+						"gs://coupanion-96203.appspot.com/images/" +
+							docSnap.data().profilePicture
+					)
 				}
-			})
-		}
+				setCoupons(docSnap.data().coupons)
+				console.log(profilePicture)
+				console.log(coupons)
+				console.log("ZIP CODE" + zip)
+
+				if (profilePicture.length > 0) {
+					console.log("Getting profile picture")
+					getProfilePicture()
+				}
+				if (typeof coupons !== "undefined") {
+					getCoupons()
+				}
+			}
+		})
+	}
+
+	useEffect(() => {
 		fetchData()
+
+		locationiq
+			.search(`${address}, ${city}, ${state} ${zip}`)
+			.then((response) => {
+				const { lat, lon } = response[0]
+				setCoordinates({ latitude: lat, longitude: lon })
+			})
+			.catch((error) => console.warn(error))
 	}, [])
+
+	function getNewCoupons() {
+		getDoc(doc(db, "Business people", id)).then((docSnap) => {
+			if (docSnap.exists()) {
+				setCoupons(docSnap.data().coupons)
+				if (typeof coupons !== "undefined") {
+					getCoupons()
+				}
+			} else {
+				console.log("No such document!")
+			}
+		})
+	}
+
+	//Gets the coupon list from the database and then makes sure that we are only displaying the first two coupons
+	function getCoupons() {
+		// If there are enough coupons, get the first two and store them in displayedCoupons
+		if (typeof coupons !== "undefined") {
+			if (Object.keys(coupons).length >= 2) {
+				const firstTwoCoupons = [coupons[0], coupons[1]]
+				setDisplayedCoupons(firstTwoCoupons)
+			} else {
+				setDisplayedCoupons(coupons)
+			}
+		}
+	}
+
+	useEffect(() => {
+		getCoupons()
+	}, [coupons])
+
+	useEffect(() => {
+		getProfilePicture()
+	}, [profilePicture])
+
+	async function getProfilePicture() {
+		console.log("PROFILE PICTURE" + profilePicture)
+		if (profilePicture.startsWith("gs://")) {
+			await storage
+				.refFromURL(profilePicture)
+				.getDownloadURL()
+				.then((url) => {
+					setProfilePicture(url)
+				})
+		}
+	}
+
+	const couponItem = ({ item }) => (
+		<View
+			style={{
+				flex: 1,
+				flexDirection: "row",
+				justifyContent: "space-around",
+				alignItems: "center",
+				backgroundColor: "#fff",
+				margin: 10,
+				padding: 20,
+				borderRadius: 10,
+			}}
+		>
+			<View
+				style={{
+					flex: 1,
+					flexDirection: "row",
+					justifyContent: "flex-start",
+					alignItems: "center",
+				}}
+			>
+				<Icon
+					style={{
+						paddingRight: 10,
+					}}
+					name="qrcode"
+					size={50}
+					color="#000"
+				/>
+				<Text
+					style={{
+						fontSize: 40,
+						textAlign: "center",
+						paddingRight: 10,
+					}}
+				>
+					{item.title}
+				</Text>
+			</View>
+			<Text>{item.expiration}</Text>
+		</View>
+	)
 
 	// A function to handle upvotes and downvotes , and to update the count of each accordingly .
 	const handleVote = (type) => {
@@ -169,10 +269,16 @@ export default function BusinessProfileScreen({ navigation }) {
 					</Text>
 				</View>
 				<View style={styles.balloon}>
-					<Image
-						source={pic}
-						style={styles.logo}
-					/>
+					{profilePicture.startsWith("https") ? (
+						<Image
+							source={{
+								uri: profilePicture,
+							}}
+							style={styles.logo}
+						/>
+					) : (
+						<Text>Loading...</Text>
+					)}
 					<View style={{ paddingHorizontal: 15 }}>
 						<Text
 							style={{
@@ -200,34 +306,33 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Active Coupons</Text>
 
-				<View style={{ alignItems: "center" }}>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #1
-						</Text>
-					</View>
-					<View style={styles.couponPack}>
-						<Icon
-							style={styles.icon}
-							name="qrcode"
-							size={50}
-							color="#000"
-						/>
-						<Text style={{ fontSize: 40, textAlign: "center" }}>
-							Coupon #2
-						</Text>
-					</View>
-				</View>
+				{coupons ? (
+					<FlatList
+						data={displayedCoupons}
+						renderItem={couponItem}
+						keyExtractor={(item) => item.id}
+						horizontal={false}
+						extraData={displayedCoupons.state}
+					/>
+				) : (
+					<Text
+						style={{
+							color: "white",
+							textAlign: "center",
+							fontSize: 20,
+						}}
+					>
+						No coupons available
+					</Text>
+				)}
 
 				<TouchableOpacity
 					style={{ paddingBottom: 15, flexDirection: "row-reverse" }}
-					onPress={() => {}}
+					onPress={() => {
+						navigation.navigate("ViewCoupons", {
+							id: id,
+						})
+					}}
 				>
 					<Text
 						style={{
@@ -281,9 +386,19 @@ export default function BusinessProfileScreen({ navigation }) {
 
 				<Text style={styles.titles}>Find us</Text>
 				<View style={{ flex: 1, height: 250 }}>
-					<MapView style={styles.map}>
-						{coordinates && <Marker coordinate={coordinates} />}
-					</MapView>
+					{coordinates && (
+						<MapView
+							style={styles.map}
+							initialRegion={{
+								latitude: coordinates.latitude,
+								longitude: coordinates.longitude,
+								latitudeDelta: 0.0922,
+								longitudeDelta: 0.0421,
+							}}
+						>
+							<Marker coordinate={coordinates} />
+						</MapView>
+					)}
 				</View>
 
 				<View style={{ flexDirection: "row", marginTop: 50 }}>

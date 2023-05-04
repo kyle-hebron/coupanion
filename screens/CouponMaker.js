@@ -149,10 +149,12 @@ const CouponMaker = ({ navigation }) => {
 								)
 								setCoupons(docSnap.data().coupons)
 								//Get all coupon codes from the database and see if the new code is already in use
-								for (let i = 0; i < coupons.length; i++) {
-									if (coupons[i].couponCode == codeText) {
-										errorAlert()
-										return
+								if (typeof coupons !== "undefined") {
+									for (let i = 0; i < coupons.length; i++) {
+										if (coupons[i].couponCode == codeText) {
+											errorAlert()
+											return
+										}
 									}
 								}
 							} catch (error) {

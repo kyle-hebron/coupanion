@@ -112,7 +112,7 @@ export default function BusinessRegister({ navigation }) {
 				},
 				{ merge: true }
 			)
-			navigation.navigate("SignedIn")
+			navigation.navigate("QuestionBusiness")
 		} else {
 			console.log("No Business Created")
 			setError("No Business Created")

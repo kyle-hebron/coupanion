@@ -11,6 +11,7 @@ import BusinessPage from "../screens/BusinessProfileScreen"
 import Verify from "../screens/Verify"
 import SearchScreen from "../screens/SearchScreen"
 import CouponMaker from "../screens/CouponMaker"
+import QuestionBusiness from "../screens/QuestionBusiness"
 
 import BottomTabNavigator from "./BottomTabNavigator"
 import BottomTabNavigatorUser from "./BottomTabNavigatorUser"
@@ -89,6 +90,11 @@ function AuthNavigator() {
 			<Stack.Screen
 				name="Question"
 				component={Question}
+			/>
+
+			<Stack.Screen
+				name="QuestionBusiness"
+				component={QuestionBusiness}
 			/>
 
 			<Stack.Screen

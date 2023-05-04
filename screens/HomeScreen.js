@@ -9,7 +9,7 @@ import {
 	SafeAreaProvider,
 	TouchableOpacity,
 } from "react-native"
-import { db, auth } from "../firebase"
+import { db, auth, storage } from "../firebase"
 import { isBusiness } from "../Helpers/dbHelper"
 
 function HomeScreen({ navigation }) {
@@ -37,31 +37,52 @@ function HomeScreen({ navigation }) {
 			}
 		)
 
-		// Get top rated businesses from Firestore .
-		const topRatedBusinessesRef = db
-			.collection("Business people")
-			.where("top rated", "==", true)
-		const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot(
-			(snapshot) => {
-				const businesses = []
-				snapshot.forEach((doc) => {
-					const data = doc.data()
-					businesses.push({
-						id: doc.id,
-						name: data.business,
-						tag: data.tag,
-						image: { uri: data.image },
-					})
-				})
-				setTopRatedBusinesses(businesses)
-			}
-		)
+		const userDocRef = db.collection("users").doc(auth.currentUser.uid)
 
-		return () => {
-			unsubscribeTrending()
-			unsubscribeTopRated()
-		}
+		const unsubscribeUserTags = userDocRef.onSnapshot((userDocSnapshot) => {
+			const userData = userDocSnapshot.data()
+			const userTags = userData ? userData.tags : []
+			//If user tags is not empty
+			if (userTags.length > 0) {
+				const topRatedBusinessesRef = db
+					.collection("Business people")
+					.where("tags", "array-contains-any", userTags)
+
+				const unsubscribeTopRated = topRatedBusinessesRef.onSnapshot(
+					(snapshot) => {
+						const businesses = []
+						snapshot.forEach((doc) => {
+							const data = doc.data()
+							businesses.push({
+								id: doc.id,
+								name: data.username,
+								tag: data.tags[0],
+								image: {
+									uri: data.image
+										? getProfilePicture(
+												"gs://coupanion-96203.appspot.com/images/" +
+													data.profilePicture
+										  )
+										: null,
+								},
+							})
+						})
+						setTopRatedBusinesses(businesses)
+					}
+				)
+			}
+		})
 	}, [])
+
+	function getProfilePicture(url) {
+		storage
+			.refFromURL(url)
+			.getDownloadURL()
+			.then((url) => {
+				console.log(url)
+				return url
+			})
+	}
 
 	const renderItem = ({ item }) => (
 		<TouchableOpacity

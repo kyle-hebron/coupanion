@@ -11,11 +11,12 @@ import {
 	Animated,
 } from "react-native"
 import MultiSelect from "react-native-multiple-select"
-
+import { useRoute } from "@react-navigation/native"
 import GradientTextButton from "../components/GradientTextButton"
 import IconInput from "../components/IconInput"
-
 import { db, auth } from "../firebase"
+import { updateProfile } from "firebase/auth"
+import { doc, setDoc, getDoc } from "firebase/firestore"
 
 const clothingItemsList = [
 	{
@@ -162,7 +163,7 @@ const FadeInView = (props) => {
 	)
 }
 
-class Question extends Component {
+class QuestionBusiness extends Component {
 	state = {
 		value: 25,
 		priceValue: 15,
@@ -185,6 +186,7 @@ class Question extends Component {
 
 	handleNextButtonPress = () => {
 		const { clothingItems, foodItems, entItems } = this.state
+
 		const selectedItems = [
 			...clothingItems.map((itemId) => {
 				const item = clothingItemsList.find(
@@ -202,12 +204,10 @@ class Question extends Component {
 			}),
 		]
 
-		// Filter out any null values
 		const filteredItems = selectedItems.filter((item) => item !== null)
 
-		// Do whatever you need to do with the filtered items array
 		console.log(filteredItems)
-		db.collection("users")
+		db.collection("Business people")
 			.doc(auth.currentUser.uid)
 			.update({ tags: filteredItems })
 			.then(() => {
@@ -242,6 +242,17 @@ class Question extends Component {
 								}}
 							>
 								Welcome to Coupanion
+							</Text>
+							<Text
+								style={{
+									fontSize: 20,
+									textAlign: "center",
+									margin: 10,
+									fontWeight: "bold",
+									color: "#FFFFFF",
+								}}
+							>
+								Please enter the tags for your business.
 							</Text>
 						</FadeInView>
 					</View>
@@ -356,49 +367,7 @@ class Question extends Component {
 									</View>
 
 									<Text />
-									<View
-										style={[
-											styles.balloon,
-											{ backgroundColor: "#FFFFFF" },
-										]}
-									>
-										<Text style={styles.baseText}>
-											Range (Radius)
-										</Text>
-										<Slider
-											maximumValue={100}
-											minimumValue={5}
-											step={5}
-											value={this.state.value}
-											onValueChange={(value) =>
-												this.setState({ value })
-											}
-										/>
-										<Text>Value: {this.state.value}</Text>
-									</View>
-									<Text />
-									<View
-										style={[
-											styles.balloon,
-											{ backgroundColor: "#FFFFFF" },
-										]}
-									>
-										<Text style={styles.baseText}>
-											Price
-										</Text>
-										<Slider
-											maximumValue={100}
-											minimumValue={0}
-											step={5}
-											value={this.state.priceValue}
-											onValueChange={(priceValue) =>
-												this.setState({ priceValue })
-											}
-										/>
-										<Text>
-											Value: {this.state.priceValue}
-										</Text>
-									</View>
+
 									<TouchableOpacity
 										onPress={() => {
 											this.handleNextButtonPress()
@@ -493,4 +462,4 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default Question
+export default QuestionBusiness
